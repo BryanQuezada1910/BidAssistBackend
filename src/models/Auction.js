@@ -16,12 +16,24 @@ const AuctionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  minimunBid: {
+    type: Number,
+    required: true,
+  },
   finalPrice: {
     type: Number,
   },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  category: {
+    type: String,
+    enum: enumCategory
+  },
+  startDate: {
+    type: Date,
+    required: true,
   },
   endDate: {
     type: Date,
@@ -43,6 +55,10 @@ const AuctionSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("Auction", AuctionSchema);
+
+const enumCategory = [
+  "Electronicos", "Fashion", "Hogar", "Juguetes", "Inmuebles", "Others"
+];
 
 const ProductSchema = new mongoose.Schema({
   product: {

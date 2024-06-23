@@ -29,7 +29,7 @@ const TicketSchema = new mongoose.Schema({
   },
   support: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Support",
+    ref: "Admin",
   },
   createdAt: {
     type: Date,
