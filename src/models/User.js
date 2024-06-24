@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -31,9 +31,8 @@ const UserSchema = new mongoose.Schema({
   refreshToken: {
     type: String,
   },
-  role: {
-    type: String,
-    default: "user",
+  IsSuscribed: {
+    type: Boolean
   },
 });
 
