@@ -17,6 +17,7 @@ const AuctionSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: true,
   },
   product: {
     type: Product.schema,
@@ -64,6 +65,18 @@ const AuctionSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "active",
+  },
+  chat: {
+    messages: [{
+      message: {
+        type: String,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
   },
 });
 
