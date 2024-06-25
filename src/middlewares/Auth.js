@@ -29,7 +29,6 @@ const auth = async (req, res, next) => {
         const user = jwt.verify(access_token, process.env.JWT_SECRET);
         req.session.user = user;
     } catch (error) {
-        console.error(error.name);
         if (error.name !== 'TokenExpiredError') {
             req.session.user = null;
             return next();
@@ -37,7 +36,7 @@ const auth = async (req, res, next) => {
 
         const user = await validateRefreshToken(access_token);
         if (user) {
-            console.log("Generando nuevo access token");
+            console.log(`Generating new acces_token for ${user.id}`);
             const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' });
             res.cookie('access_token', newAccessToken, {
                 httpOnly: true,

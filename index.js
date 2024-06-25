@@ -1,17 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./src/config/database.js";
 import cors from "cors";
+import connectDB from "./src/config/database.js";
+import cookieParser from 'cookie-parser';
+import { authRouter } from './src/routes/AuthRoutes.js';
 
 const app = express();
-
-// Load env vars
-dotenv.config();
+app.use(express.json());
+app.use(cookieParser());
 
 // Enable CORS Middleware
 app.use(cors());
 // Body parser
 app.use(express.json());
+
+app.use('/api/auth', authRouter);
+
+// Load env vars
+dotenv.config();
 
 // Connect to database
 connectDB();
