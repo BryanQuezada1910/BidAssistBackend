@@ -1,4 +1,14 @@
 import mongoose from "mongoose";
+import Product from "./Product.js";
+
+const enumCategory = [
+  "Electronicos",
+  "Fashion",
+  "Hogar",
+  "Juguetes",
+  "Inmuebles",
+  "Others",
+];
 
 const AuctionSchema = new mongoose.Schema({
   title: {
@@ -9,7 +19,7 @@ const AuctionSchema = new mongoose.Schema({
     type: String,
   },
   product: {
-    type: ProductSchema,
+    type: Product.schema,
     required: true,
   },
   initialPrice: {
@@ -29,7 +39,8 @@ const AuctionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: enumCategory
+    enum: enumCategory,
+    required: true,
   },
   startDate: {
     type: Date,
@@ -44,10 +55,12 @@ const AuctionSchema = new mongoose.Schema({
     ref: "Organization",
     required: true,
   },
-  users: [{
+  users: [
+    {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    }],
+    },
+  ],
   status: {
     type: String,
     default: "active",
@@ -55,17 +68,3 @@ const AuctionSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("Auction", AuctionSchema);
-
-const enumCategory = [
-  "Electronicos", "Fashion", "Hogar", "Juguetes", "Inmuebles", "Others"
-];
-
-const ProductSchema = new mongoose.Schema({
-  product: {
-    type: String,
-    required: true,
-  },
-  images: {
-    type: [String],
-  },
-});

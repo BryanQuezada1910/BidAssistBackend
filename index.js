@@ -1,7 +1,7 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import connectDB from './src/config/database.js';
-import cors from 'cors';
+import express from "express";
+import dotenv from "dotenv";
+import connectDB from "./src/config/database.js";
+import cors from "cors";
 
 const app = express();
 
@@ -17,8 +17,8 @@ app.use(express.json());
 connectDB();
 
 // Route get request, to test the server
-app.get('/', (req, res) => {
-  res.send('Hello World');
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
 // Start the server
