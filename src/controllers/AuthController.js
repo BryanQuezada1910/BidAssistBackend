@@ -1,9 +1,9 @@
-import express from 'express';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const GenerateAccesToken = (user) =>
-    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '2m' });
+    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' });
 
 const GenerateRefreshToken = (user) =>
     jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -48,16 +48,24 @@ const register = async (req, res) => {
         res.status(201).cookie('access_token', access_token, {
             httpOnly: true,
             maxAge: 3600000
-        }).json({ message: "Successful" });
+        }).json({ username: newUser.username, email: newUser.email });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 
 };
 
 const login = async (req, res) => {
+
+    const user = req.session.user;
+    if (user) {
+        return res.status(200).json({
+            username: user.username,
+            email: user.email
+        });
+    }
+
     if (!req.body) {
         return res.status(400).json({ message: 'The body of the request is empty' });
     }
@@ -74,10 +82,21 @@ const login = async (req, res) => {
             return res.status(404).json({ message: "The user does not exist" });
         }
 
+        const isPassValid = await bcrypt.compare(password, user.password);
+        if (!isPassValid) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
+        const access_token = GenerateAccesToken(user);
+
+        res.status(200).cookie('access_token', access_token, {
+            httpOnly: true,
+            maxAge: 3600000
+        }).json({ username: user.username, email: user.email });
 
     } catch (error) {
-
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 
 };
