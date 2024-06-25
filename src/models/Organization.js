@@ -25,7 +25,7 @@ const OrganizationSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-  }
+  },
 });
 
 OrganizationSchema.pre("save", async function (next) {

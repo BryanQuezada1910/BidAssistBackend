@@ -1,27 +1,34 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import connectDB from "./src/config/database.js";
 import cookieParser from 'cookie-parser';
 import { authRouter } from './src/routes/AuthRoutes.js';
 
-dotenv.config();
-
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// Enable CORS Middleware
+app.use(cors());
+// Body parser
+app.use(express.json());
+
 app.use('/api/auth', authRouter);
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("Connected to DB"))
-  .catch(error => console.error(error));
+// Load env vars
+dotenv.config();
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
+// Connect to database
+connectDB();
+
+// Route get request, to test the server
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
+// Start the server
+const PORT = process.env.PORT || 5000;
 app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
