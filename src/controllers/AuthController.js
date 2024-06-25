@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const GenerateAccesToken = (user) =>
-    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' });
+    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
 
 const GenerateRefreshToken = (user) =>
     jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -101,4 +101,9 @@ const login = async (req, res) => {
 
 };
 
-export { register, login };
+const logout = (req, res) => {
+    res.clearCookie('access_token');
+    return res.status(204).end();
+};
+
+export { register, login, logout };
