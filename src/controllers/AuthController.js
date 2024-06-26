@@ -1,16 +1,11 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import { addUser } from '../services/userService.js';
+import { GenerateAccesToken } from '../services/tokenAuthService.js';
 
 dotenv.config({ path: '../../.env' });
-
-const GenerateAccesToken = (user) =>
-    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
-
-const GenerateRefreshToken = (user) =>
-    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
 const register = async (req, res) => {
 
@@ -35,18 +30,15 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "The email has already been taken" });
         }
 
-        const newUser = new User({ name, lastname, username, email, password, isSuscribed: false });
-        newUser.save()
-            .then((savedUser) => {
-                const refresh_token = GenerateRefreshToken(savedUser);
+        const userInfo = {
+            name: name,
+            lastname: lastname,
+            username: username,
+            email: email,
+            password: password
+        };
 
-                User.findOneAndUpdate(
-                    { _id: savedUser._id },
-                    { refreshToken: refresh_token },
-                    { new: true }
-                ).then(() => console.log(`Add Refresh Token for ${savedUser._id}`));
-            });
-
+        const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
 
         res.status(201).cookie('access_token', access_token, {
