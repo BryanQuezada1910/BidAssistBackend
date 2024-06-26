@@ -11,7 +11,7 @@ router.get('/:id', getAuctionById);
 // POST /api/auctions
 router.post('/', createAuction);
 // PUT /api/auctions/:id
-router.patch('/:id', updateAuction);
+router.put('/:id', updateAuction);
 // DELETE /api/auctions/:id
 router.delete('/:id', deleteAuction);
 
