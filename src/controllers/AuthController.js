@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const GenerateAccesToken = (user) =>
-    jwt.sign({ id: user._id, name: user.name, lastname: user.lastname, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    jwt.sign({ id: user._id, name: user.name, lastname: user.lastname, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 const GenerateRefreshToken = (user) =>
     jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '8d' });
