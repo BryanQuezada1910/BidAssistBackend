@@ -4,8 +4,6 @@ import userModel from "../models/User.js";
 export class TicketController {
 
   static async getAll(req, res) {
-
-
     try {
 
       const { user: userId } = req.query;
@@ -48,12 +46,10 @@ export class TicketController {
 
       if (!user) return res.status(404).json({ error: "User not found" });
 
-      const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
       const newTicket = ticketModel({
         ...req.body,
         priority: (user.isSuscribed) ? "medium" : undefined,
-        createdBy: userId,
-        createdAt: undefined
+        createdBy: userId
       });
       await newTicket.save();
 
