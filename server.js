@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./src/config/database.js";
 import cookieParser from 'cookie-parser';
 import { authRouter } from './src/routes/AuthRoutes.js';
+import auctionRoutes from './src/routes/auctionRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -13,11 +14,13 @@ app.use(cookieParser());
 app.use(cors());
 // Body parser
 app.use(express.json());
-
-app.use('/api/auth', authRouter);
-
 // Load env vars
 dotenv.config();
+
+// Auth routes
+app.use('/api/auth', authRouter);
+// Auction routes
+app.use('/api/auctions', auctionRoutes);
 
 // Connect to database
 connectDB();
