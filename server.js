@@ -15,7 +15,12 @@ dotenv.config();
 // Create express app
 const app = express();
 const server = http.createServer(app); // Create server instance
-const io = new Server(server); // Create socket.io instance
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  }
+}); // Create socket.io instance
 
 // Connect to database
 connectDB();
