@@ -4,6 +4,8 @@ import cors from "cors";
 import connectDB from "./src/config/database.js";
 import cookieParser from 'cookie-parser';
 import { authRouter } from './src/routes/AuthRoutes.js';
+import { ticketsRouter } from "./src/routes/ticket.js";
+import { webhookRouter } from "./src/routes/webhook.js";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use("/api/ticket", ticketsRouter);
 
 // Load env vars
 dotenv.config();
