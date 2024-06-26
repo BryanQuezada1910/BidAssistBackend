@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import { addUser } from '../services/userService.js';
 import { GenerateAccesToken } from '../services/tokenAuthService.js';
+import { MailWrapper } from '../services/emails.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -109,24 +110,9 @@ const forgotPassword = async (req, res) => {
         }
 
         const userEmail = user.email;
-        const emailSender = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
 
-        const mailOptions = {
-            from: process.env.EMAIL,
-            to: userEmail,
-            subject: 'Reset Password Request',
-            text: 'Test for reset password'
-        };
+        MailWrapper.sendResetPasswordEmail([userEmail], "test.com");
 
-        await emailSender.sendMail(mailOptions);
         res.status(200).json({ message: "Email has sent" });
 
     } catch (error) {
