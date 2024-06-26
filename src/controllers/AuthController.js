@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+
+dotenv.config({ path: '../../.env' });
 
 const GenerateAccesToken = (user) =>
     jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
@@ -98,6 +102,45 @@ const login = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
+};
+
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "No email was provided" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "Email is not registered" });
+        }
+
+        const userEmail = user.email;
+        const emailSender = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: userEmail,
+            subject: 'Reset Password Request',
+            text: 'Test for reset password'
+        };
+
+        await emailSender.sendMail(mailOptions);
+        res.status(200).json({ message: "Email has sent" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error ocurred" });
+    }
 
 };
 
@@ -106,4 +149,4 @@ const logout = (req, res) => {
     return res.status(204).end();
 };
 
-export { register, login, logout };
+export { register, login, logout, forgotPassword };
