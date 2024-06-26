@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+import { addUser } from '../services/userService.js';
+import { GenerateAccesToken } from '../services/tokenAuthService.js';
 
-const GenerateAccesToken = (user) =>
-    jwt.sign({ id: user._id, name: user.name, lastname: user.lastname, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-const GenerateRefreshToken = (user) =>
-    jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '8d' });
+dotenv.config({ path: '../../.env' });
 
 const register = async (req, res) => {
 
@@ -31,18 +30,15 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "The email has already been taken" });
         }
 
-        const newUser = new User({ name, lastname, username, email, password, isSuscribed: false });
-        newUser.save()
-            .then((savedUser) => {
-                const refresh_token = GenerateRefreshToken(savedUser);
+        const userInfo = {
+            name: name,
+            lastname: lastname,
+            username: username,
+            email: email,
+            password: password
+        };
 
-                User.findOneAndUpdate(
-                    { _id: savedUser._id },
-                    { refreshToken: refresh_token },
-                    { new: true }
-                ).then(() => console.log(`Add Refresh Token for ${savedUser._id}`));
-            });
-
+        const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
 
         res.status(201).cookie('access_token', access_token, {
@@ -98,6 +94,45 @@ const login = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
+};
+
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "No email was provided" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "Email is not registered" });
+        }
+
+        const userEmail = user.email;
+        const emailSender = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: userEmail,
+            subject: 'Reset Password Request',
+            text: 'Test for reset password'
+        };
+
+        await emailSender.sendMail(mailOptions);
+        res.status(200).json({ message: "Email has sent" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error ocurred" });
+    }
 
 };
 
@@ -106,4 +141,4 @@ const logout = (req, res) => {
     return res.status(204).end();
 };
 
-export { register, login, logout };
+export { register, login, logout, forgotPassword };
