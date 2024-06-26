@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Product from "./Product.js";
 
 const enumCategory = [
   "Electronicos",
@@ -20,8 +19,14 @@ const AuctionSchema = new mongoose.Schema({
     required: true,
   },
   product: {
-    type: Product.schema,
-    required: true,
+    name: {
+      type: String,
+      required: true,
+    },
+    images: [{
+      type: String,
+      required: true,
+    }],
   },
   initialPrice: {
     type: Number,
