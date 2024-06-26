@@ -4,13 +4,18 @@ import userModel from "../models/User.js";
 export class TicketController {
 
   static async getAll(req, res) {
+
+
     try {
+
       const { user: userId } = req.query;
 
-      if (!isValidObjectId(userId)) return res.status(400).send({ message: "Invalid user ID" });
+      if (userId && !isValidObjectId(userId)) {
+        return res.status(400).send({ message: "Invalid user ID" });
+      }
+      const tickets = await ticketModel.find(userId ? { createdBy: userId } : {});
 
-      const tickets = await ticketModel.find({ userId });
-      if (!tickets.length) return res.status(404).send({ message: "No tickets found for the given user" });
+      if (!tickets.length) return res.status(404).send({ message: "No tickets found" });
 
       return res.status(200).json(tickets);
     } catch (error) {
@@ -21,9 +26,6 @@ export class TicketController {
   static async getById(req, res) {
     try {
       const { id } = req.params;
-
-      if (!isValidObjectId(user)) return res.status(400).send({ message: "Invalid ID" });
-
       const ticket = await ticketModel.findById(id);
 
       if (!ticket) return res.status(404).json({ error: "Ticket not found" });
@@ -35,29 +37,32 @@ export class TicketController {
   }
 
   static async create(req, res) {
+
+    const { user: userId } = req.query;
+    if (!userId) return res.status(400).send({ message: "User ID not provided" });
+
+
     try {
-      const { user: userId } = req.query;
-
       if (!isValidObjectId(userId)) return res.status(400).send({ message: "Invalid user ID" });
-
-      const user = userModel.findById(userId);
+      const user = await userModel.findById(userId);
 
       if (!user) return res.status(404).json({ error: "User not found" });
 
+      const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
       const newTicket = ticketModel({
         ...req.body,
-        priority: (user.IsSuscribed) ? "medium" : undefined,
+        priority: (user.isSuscribed) ? "medium" : undefined,
         createdBy: userId,
+        createdAt: undefined
       });
-
       await newTicket.save();
 
       return res.status(201).json(newTicket);
     } catch (error) {
-      if (err.name === "ValidationError") {
+      if (error.name === "ValidationError") {
         return res.status(400).json({
           message: "Validation Error",
-          errors: Object.values(err.errors).map(error => error.message),
+          errors: Object.values(error.errors).map(error => error.message),
         });
       }
 
@@ -83,31 +88,14 @@ export class TicketController {
   }
 
   static async update(req, res) {
-
-    if (!req.body) {
-      return res.status(400).send({
-        message: "Data to update can not be empty!"
-      });
-    }
-
     const { id } = req.params;
 
+    if (!isValidObjectId(id)) return res.status(400).send({ message: "Invalid ticket ID" });
+
     try {
-
-      if (!isValidObjectId(id)) return res.status(400).send({ message: "Invalid ticket ID" });
-
-      const ticketToUpdate = await ticketModel.findById(id);
-
-      if (!ticketToUpdate) return res.status(404).json({ error: "Ticket not found" });
-
-      const { title, description } = req.body;
-
-      ticketToUpdate.title = title;
-      ticketToUpdate.description = description;
-
-      await ticketToUpdate.save();
-
-      return res.status(200).json(ticketToUpdate);
+      const ticket = await ticketModel.findByIdAndUpdate(id, req.body);
+      if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+      return res.status(200).json(ticket);
     } catch (error) {
       return res.status(500).send({ message: "Internal Server Error" });
     }
