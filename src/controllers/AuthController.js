@@ -1,9 +1,8 @@
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
-import nodemailer from 'nodemailer';
 import { addUser } from '../services/userService.js';
-import { GenerateAccesToken } from '../services/tokenAuthService.js';
+import { GenerateAccesToken } from '../services/JWTService.js';
 import { MailWrapper } from '../services/emails.js';
 
 dotenv.config({ path: '../../.env' });
@@ -110,7 +109,6 @@ const forgotPassword = async (req, res) => {
         }
 
         const userEmail = user.email;
-
         MailWrapper.sendResetPasswordEmail([userEmail], "test.com");
 
         res.status(200).json({ message: "Email has sent" });
