@@ -20,7 +20,7 @@ dotenv.config();
 // Auth routes
 app.use('/api/auth', authRouter);
 // Auction routes
-app.use('/api/auctions', auctionRoutes);
+app.use('/api/auction', auctionRoutes);
 
 // Connect to database
 connectDB();

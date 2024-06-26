@@ -1,18 +1,18 @@
 import express from 'express';
-import auctionController from '../controllers/auctionController';
+import { getAllAuctions, getAuctionById, createAuction, updateAuction, deleteAuction } from '../controllers/auctionController.js';
 
 const router = express.Router();
 
 // Routes for auctions
 // GET /api/auctions
-router.get('/', auctionController.getAllAuctions);
+router.get('/', getAllAuctions);
 // GET /api/auctions/:id
-router.get('/:id', auctionController.getAuctionById);
+router.get('/:id', getAuctionById);
 // POST /api/auctions
-router.post('/', auctionController.createAuction);
+router.post('/', createAuction);
 // PUT /api/auctions/:id
-router.patch('/:id', auctionController.updateAuction);
+router.patch('/:id', updateAuction);
 // DELETE /api/auctions/:id
-router.delete('/:id', auctionController.deleteAuction);
+router.delete('/:id', deleteAuction);
 
 export default router;

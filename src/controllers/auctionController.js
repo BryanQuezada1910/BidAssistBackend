@@ -1,4 +1,4 @@
-import Auction from "../models/Auction";
+import Auction from "../models/Auction.js";
 
 // Path: src/controllers/auctionController.js
 // Method: GET
@@ -37,6 +37,22 @@ export const getAuctionById = async (req, res) => {
 // Method: POST
 // Create a new auction
 export const createAuction = async (req, res) => {
+  // Check if required fields are missing  
+  if (
+    req.body.title == null ||
+    req.body.description == null ||
+    req.body.product == null ||
+    req.body.initialPrice == null ||
+    req.body.minimunBid == null ||
+    req.body.category == null ||
+    req.body.startDate == null ||
+    req.body.endDate == null ||
+    req.body.ownerUser == null
+  ) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  // Create a new auction
   const auction = new Auction({
     title: req.body.title,
     description: req.body.description,
@@ -68,12 +84,15 @@ export const updateAuction = async (req, res) => {
 
     // Check if auction can be updated (20 minutes before start time)
     const now = new Date();
-    const twentyMinutesBeforeStart = new Date(auction.startDate.getTime() - 20 * 60 * 1000);
+    const twentyMinutesBeforeStart = new Date(
+      auction.startDate.getTime() - 20 * 60 * 1000
+    );
 
     if (now >= twentyMinutesBeforeStart) {
       return res.status(400).json({
-          message: "Auction cannot be updated within 20 minutes of its start time",
-        });
+        message:
+          "Auction cannot be updated within 20 minutes of its start time",
+      });
     }
 
     // Check if auction has ended
@@ -83,7 +102,9 @@ export const updateAuction = async (req, res) => {
 
     // Check if auction is in progress
     if (req.body.status === "in progress") {
-        return res.status(400).json({ message: "Auction cannot be updated to in progress" });
+      return res
+        .status(400)
+        .json({ message: "Auction cannot be updated to in progress" });
     }
 
     if (req.body.title != null) {
@@ -125,22 +146,37 @@ export const updateAuction = async (req, res) => {
 // Method: DELETE
 // Delete an auction by id
 export const deleteAuction = async (req, res) => {
+    const { id } = req.params;
   try {
     const auction = await Auction.findById(req.params.id);
     if (auction == null) {
-      return res.status(404).json({ message: 'Auction not found' });
+      return res.status(404).json({ message: "Auction not found" });
     }
 
     const now = new Date();
-    const twentyMinutesBeforeStart = new Date(auction.startDate.getTime() - 20 * 60 * 1000);
+    const twentyMinutesBeforeStart = new Date(
+      auction.startDate.getTime() - 20 * 60 * 1000
+    );
 
-    if (auction.status === 'in progress' || auction.status === 'ended' || now >= twentyMinutesBeforeStart) {
-      return res.status(400).json({ message: 'Auction cannot be deleted' });
+    if (
+      auction.status === "in progress" ||
+      auction.status === "ended" ||
+      now >= twentyMinutesBeforeStart
+    ) {
+      return res.status(400).json({ message: "Auction cannot be deleted" });
     }
 
-    await auction.remove();
-    res.json({ message: 'Auction deleted' });
+    await auction.deleteOne();
+    res.json({ message: "Auction deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
+
+export default {
+  getAllAuctions,
+  getAuctionById,
+  createAuction,
+  updateAuction,
+  deleteAuction,
 };
