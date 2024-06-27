@@ -1,5 +1,5 @@
 import User from '../models/User.js';
-import { MailWrapper } from './emails.js';
+import { MailWrapper } from './emailService.js';
 import { formatDate } from '../utils/dateUtils.js';
 
 export const sendTickets = async (updatedTickets) => {
