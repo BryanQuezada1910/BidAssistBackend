@@ -1,0 +1,42 @@
+<!-- reports/AuctionReport.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Subastas</title>
+</head>
+<body>
+  <h1>Reporte de Subastas</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Producto</th>
+        <th>Precio Inicial</th>
+        <th>Estado</th>
+        <th>Líderes</th>
+        <th>Categoría</th>
+      </tr>
+    </thead>
+    <tbody id="auction-report-body"> 
+      {{#auctions}}
+      <td>{{title}}</td>
+      <td>{{description}}</td>
+      <td>{{product}}</td>
+      <td>{{initialPrice}}</td>
+      <td>{{status}}</td>
+      <td>{{leaders}}</td>
+      <td>{{category}}</td>
+    </tbody>
+    
+  </table>
+  
+ 
+  
+           
+          
+
+</body>
+</html>
