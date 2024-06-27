@@ -1,11 +1,10 @@
-import { sendTickets } from "../services/webhook.js";
+import { sendTickets } from "../services/webHookService.js";
 
 export class WebHookController {
   static async getTickets(req, res) {
 
 
     const { updatedTickets } = req.body;
-    console.log('Tickets recibidos: ', updatedTickets);
     if (!updatedTickets || !updatedTickets.length) {
       return res.status(400).send({ message: "No tickets to update" });
     }
