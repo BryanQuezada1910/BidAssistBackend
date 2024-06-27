@@ -1,4 +1,4 @@
-import { sendTickets } from "../services/webhook.js";
+import { sendTickets } from "../services/webHookService.js";
 
 export class WebHookController {
   static async getTickets(req, res) {
