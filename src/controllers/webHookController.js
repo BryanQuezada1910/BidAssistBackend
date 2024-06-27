@@ -5,7 +5,6 @@ export class WebHookController {
 
 
     const { updatedTickets } = req.body;
-    console.log('Tickets recibidos: ', updatedTickets);
     if (!updatedTickets || !updatedTickets.length) {
       return res.status(400).send({ message: "No tickets to update" });
     }
