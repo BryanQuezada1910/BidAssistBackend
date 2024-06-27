@@ -36,8 +36,13 @@ const AuctionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  finalPrice: {
+  currentBider: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  currentBid: {
     type: Number,
+    required: true,
   },
   createdAt: {
     type: Date,
@@ -56,12 +61,12 @@ const AuctionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  organization: {
+  ownerUser: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Organization",
+    ref: "User",
     required: true,
   },
-  users: [
+  bidders: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
