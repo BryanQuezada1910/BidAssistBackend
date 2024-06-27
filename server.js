@@ -8,12 +8,11 @@ import auctionRoutes from './src/routes/auctionRoutes.js'; // Import auction rou
 import http from 'http'; // Import http module for creating server instance
 import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHandler function
 import { Server } from "socket.io"; // Import Server class from socket.io
+import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
+import { webHookRouter } from "./src/routes/webhookRoutes.js"; // Create express appimport { ticketsRouter } from "./src/routes/ticketRoutes.js";
 
 // Load env vars
 dotenv.config();
-
-// Create express appimport { ticketsRouter } from "./src/routes/ticketRoutes.js";
-import { webHookRouter } from "./src/routes/webhookRoutes.js";
 
 const app = express();
 const server = http.createServer(app); // Create server instance
@@ -36,6 +35,7 @@ app.use(cookieParser());
 
 // Auth routes
 app.use('/api/auth', authRouter);
+// Ticket routes
 app.use("/api/ticket", ticketsRouter);
 app.use("api/ticket/webhook", webHookRouter)
 // Auction routes
