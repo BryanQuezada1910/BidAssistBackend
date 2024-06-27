@@ -2,10 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./src/config/database.js";
-import cookieParser from 'cookie-parser';
-import { authRouter } from './src/routes/AuthRoutes.js';
+import cookieParser from "cookie-parser";
+import { authRouter } from "./src/routes/AuthRoutes.js";
 import { ticketsRouter } from "./src/routes/ticketRoutes.js";
 import { webHookRouter } from "./src/routes/webhookRoutes.js";
+import { reportRouter } from "./src/routes/reportRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -16,9 +17,10 @@ app.use(cors());
 // Body parser
 app.use(express.json());
 
-app.use('/api/auth', authRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/ticket", ticketsRouter);
-app.use("api/ticket/webhook", webHookRouter)
+app.use("api/ticket/webhook", webHookRouter);
+app.use("/api/report", reportRouter);
 
 // Load env vars
 dotenv.config();

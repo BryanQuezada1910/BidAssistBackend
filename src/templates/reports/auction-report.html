@@ -1,52 +1,42 @@
+<!-- reports/AuctionReport.html -->
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Reporte de Subastas</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Subastas</title>
 </head>
 <body>
-    <h1>Reporte de Subastas</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Producto</th>
-                <th>Precio Inicial</th>
-                <th>Estado</th>
-                <th>Usuario Ganador</th>
-                <th>Categoría</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each auctions}}
-            <tr>
-                <td>{{this.title}}</td>
-                <td>{{this.description}}</td>
-                <td>{{this.product.product}}</td>
-                <td>{{this.initialPrice}}</td>
-                <td>{{this.status}}</td>
-                <td>{{this.winnerUser}}</td>
-                <td>{{this.category}}</td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+  <h1>Reporte de Subastas</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Producto</th>
+        <th>Precio Inicial</th>
+        <th>Estado</th>
+        <th>Líderes</th>
+        <th>Categoría</th>
+      </tr>
+    </thead>
+    <tbody id="auction-report-body"> 
+      {{#auctions}}
+      <td>{{title}}</td>
+      <td>{{description}}</td>
+      <td>{{product}}</td>
+      <td>{{initialPrice}}</td>
+      <td>{{status}}</td>
+      <td>{{leaders}}</td>
+      <td>{{category}}</td>
+    </tbody>
+    
+  </table>
+  
+ 
+  
+           
+          
+
 </body>
 </html>
