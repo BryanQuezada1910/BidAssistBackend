@@ -17,8 +17,8 @@ const app = express();
 const server = http.createServer(app); // Create server instance
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: "*",// Allow the client to connect, must be changed in production
+    methods: ["GET", "POST"], // Allow GET and POST requests
   }
 }); // Create socket.io instance
 
@@ -47,6 +47,6 @@ socketHandler(io);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
