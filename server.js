@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { authRouter } from './src/routes/AuthRoutes.js';
 import { ticketsRouter } from "./src/routes/ticketRoutes.js";
 import { webHookRouter } from "./src/routes/webhookRoutes.js";
+import { usersRouter } from "./src/routes/UsersRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/user', usersRouter);
 app.use("/api/ticket", ticketsRouter);
 app.use("api/ticket/webhook", webHookRouter)
 
