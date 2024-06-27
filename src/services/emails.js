@@ -57,4 +57,12 @@ export class MailWrapper {
     const subject = 'Bienvenido a BidAssist';
     this.send(to, subject, htmlContent);
   }
+
+  static sendHighPriorityNotificationEmail(to, tickets, detailsUrl) {
+    const templatePath = path.join(__dirname, '../templates/emails/tickets-updated.html');
+    const html = this.loadTemplate(templatePath, { tickets, details_url: detailsUrl });
+    const subject = 'Notificación de Cambio de Prioridad de Tickets a "High"';
+
+    this.send(to, subject, html);
+  }
 }
