@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import dotenv from 'dotenv';
 import { addUser } from '../services/userService.js';
 import { GenerateAccesToken } from '../services/JWTService.js';
-import { MailWrapper } from '../services/emails.js';
+import { MailWrapper } from '../services/emailService.js';
 
 dotenv.config({ path: '../../.env' });
 
