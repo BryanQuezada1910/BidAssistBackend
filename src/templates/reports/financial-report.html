@@ -1,56 +1,106 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>Reporte Financiero</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            margin-bottom: 0;
+            border-radius: 5px 5px 0 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+
+        .total-revenue {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
         }
     </style>
 </head>
+
 <body>
-    <h1>Reporte Financiero</h1>
+    <h1>Reporte Financiero de Subastas</h1>
+
+    {{#closedAuctions.length}}
     <table>
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Producto</th>
-                <th>Categoría</th>
-                <th>Precio Final</th>
-                <th>Fecha de Finalización</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each auctionsFinish}}
-            <tr>
-                <td>{{this.title}}</td>
-                <td>{{this.description}}</td>
-                <td>{{this.product.product}}</td>
-                <td>{{this.category}}</td>
-                <td>{{this.finalPrice}}</td>
-                <td>{{this.endDate}}</td>
-            </tr>
-            {{/each}}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4">Total Generado</td>
-                <td colspan="2">{{totalGenerated}}</td>
-            </tr>
-        </tfoot>
+        <tr>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio Inicial</th>
+            <th>Oferta Mínima</th>
+            <th>Oferta Actual</th>
+            <th>Fecha de Cierre</th>
+        </tr>
+        {{#closedAuctions}}
+        <tr>
+            <td>{{title}}</td>
+            <td>{{description}}</td>
+            <td>{{productName}}</td>
+            <td>{{category}}</td>
+            <td>{{initialPrice}}</td>
+            <td>{{minimumBid}}</td>
+            <td>{{currentBid}}</td>
+            <td>{{endDate}}</td>
+        </tr>
+        {{/closedAuctions}}
     </table>
+
+    <div class="total-revenue">
+        <p>Total Recaudado: {{totalRevenue}}</p>
+    </div>
+    {{/closedAuctions.length}}
+    {{^closedAuctions.length}}
+    <p class="no-data">No hay subastas finalizadas.</p>
+    {{/closedAuctions.length}}
 </body>
+
 </html>

@@ -1,11 +1,9 @@
-<!-- welcome_email_template.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenido/a</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -25,7 +23,7 @@
     }
 
     .header {
-      background-color: #007bff;
+      background-color: #28a745;
       color: #ffffff;
       text-align: center;
       padding: 20px;
@@ -42,6 +40,17 @@
       line-height: 1.6;
     }
 
+    .product-image {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .product-image img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+
     .footer {
       background-color: #f4f4f4;
       color: #777777;
@@ -55,15 +64,17 @@
 <body>
   <div class="container">
     <div class="header">
-      ¡Bienvenido/a 🙋!
+      Comprobante de Subasta Ganada
     </div>
     <div class="content">
-      <p>Hola, {{user_name}}</p>
-      <p>Te damos la bienvenida a nuestro servicio. Esperamos que disfrutes de todas las funcionalidades que ofrecemos.
-      </p>
-      <p>Gracias por unirte a nosotros.</p>
-      <p>Atentamente,</p>
-      <p>El equipo de BidAssist</p>
+      <p>Hola {{currentBider}},</p>
+      <p>¡Felicidades! Has ganado la subasta del artículo {{product.name}} finalizada en la fecha {{endDate}}. A
+        continuación, encontrarás los detalles de tu ganancia:</p>
+      <div class="product-image">
+        <img src="{{product.images.0}}" alt="{{product.name}}">
+      </div>
+      <p>Precio Final Pagado: {{currentBid}}</p>
+      <p>Se ha descontado esta cantidad de su cuenta.</p>
     </div>
     <div class="footer">
       &copy; 2024 BidAssist. Todos los derechos reservados.

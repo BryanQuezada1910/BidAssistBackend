@@ -18,7 +18,6 @@ const validateRefreshToken = async (access_token) => {
     }
 
     return user;
-
 };
 
 const auth = async (req, res, next) => {

@@ -1,8 +1,8 @@
-import express from "express";
-import { getAuctionReport } from "../controllers/reportController.js";
+import { Router } from "express";
+import { ReportController } from "../controllers/reportController.js";
 
-const reportRouter = express.Router();
+export const reportRouter = Router();
 
-reportRouter.get("/auctions", getAuctionReport);
+reportRouter.get("/", ReportController.getReport);
 
-export { reportRouter };
+
