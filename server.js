@@ -11,6 +11,7 @@ import { usersRouter } from "./src/routes/UsersRoutes.js";
 import { Server } from "socket.io"; // Import Server class from socket.io
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
 import { webHookRouter } from "./src/routes/webhookRoutes.js"; // Create express appimport { ticketsRouter } from "./src/routes/ticketRoutes.js";
+import { reportRouter } from "./src/routes/reportRoutes.js";
 
 // Load env vars
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/ticket", ticketsRouter);
 app.use("api/ticket/webhook", webHookRouter)
 // Auction routes
 app.use('/api/auction', auctionRoutes);
+app.use("/api/report", reportRouter);
 
 // Route get request, to test the server
 app.get("/", (req, res) => {
