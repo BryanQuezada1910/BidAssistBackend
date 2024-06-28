@@ -1,6 +1,5 @@
 import Auction from "../models/Auction.js";
 
-// Path: src/controllers/auctionController.js
 // Method: GET
 // Get all auctions
 export const getAllAuctions = async (req, res) => {
@@ -15,7 +14,6 @@ export const getAllAuctions = async (req, res) => {
   }
 };
 
-// Path: src/controllers/auctionController.js
 // Method: GET
 // Get a single auction by id
 export const getAuctionById = async (req, res) => {
@@ -33,7 +31,6 @@ export const getAuctionById = async (req, res) => {
   }
 };
 
-// Path: src/controllers/auctionController.js
 // Method: POST
 // Create a new auction
 export const createAuction = async (req, res) => {
@@ -74,6 +71,8 @@ export const createAuction = async (req, res) => {
   }
 };
 
+// Method: PUT
+// Update an auction by id
 export const updateAuction = async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id);
@@ -142,7 +141,6 @@ export const updateAuction = async (req, res) => {
   }
 };
 
-// Path: src/controllers/auctionController.js
 // Method: DELETE
 // Delete an auction by id
 export const deleteAuction = async (req, res) => {
