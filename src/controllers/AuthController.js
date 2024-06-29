@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
 import { addUser } from '../services/userService.js';
-import { GenerateAccesToken } from '../services/JWTService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 import { MailWrapper } from '../services/emailService.js';
 
 dotenv.config({ path: '../../.env' });
@@ -40,6 +40,8 @@ const register = async (req, res) => {
 
         const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
+
+        MailWrapper.sendWelcomeEmail(newUser.email, newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
             httpOnly: true,
@@ -84,6 +86,7 @@ const login = async (req, res) => {
         }
 
         const access_token = GenerateAccesToken(user);
+        const newUserRefreshToken = await User.findByIdAndUpdate(user._id, { refreshToken: GenerateRefreshToken(user) });
 
         res.status(200).cookie('access_token', access_token, {
             httpOnly: true,
