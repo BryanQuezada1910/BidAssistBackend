@@ -9,6 +9,21 @@ const enumCategory = [
   "Others",
 ];
 
+const messageSchema = new mongoose.Schema({
+  amount: {
+    type: Number,
+    required: true,
+  },
+  username: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const AuctionSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -25,14 +40,13 @@ const AuctionSchema = new mongoose.Schema({
     },
     images: [{
       type: String,
-      required: true,
     }],
   },
   initialPrice: {
     type: Number,
     required: true,
   },
-  minimunBid: {
+  minimumBid: {
     type: Number,
     required: true,
   },
@@ -74,19 +88,10 @@ const AuctionSchema = new mongoose.Schema({
   ],
   status: {
     type: String,
-    default: "active",
+    default: "active", // active, in progress, finished
   },
   chat: {
-    messages: [{
-      message: {
-        type: String,
-        required: true,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    }],
+    messages: [messageSchema],
   },
 });
 
