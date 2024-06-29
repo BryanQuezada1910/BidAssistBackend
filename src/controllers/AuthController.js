@@ -159,6 +159,7 @@ const updatePassword = async (req, res) => {
         const newPassword = await bcrypt.hash(password, 10);
 
         await User.findByIdAndUpdate(currentUserInfo._id, { password: newPassword, refreshToken: newRefreshToken });
+        MailWrapper.sendPasswordResetConfirmationEmail([currentUserInfo.email], currentUserInfo.username);
         res.status(200).json({ message: "Password has been updated" });
     } catch (error) {
         console.log(error);
