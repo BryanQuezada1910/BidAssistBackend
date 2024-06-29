@@ -41,7 +41,7 @@ const register = async (req, res) => {
         const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
 
-        MailWrapper.sendWelcomeEmail(newUser.email, newUser.username);
+        MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
             httpOnly: true,
@@ -86,7 +86,8 @@ const login = async (req, res) => {
         }
 
         const access_token = GenerateAccesToken(user);
-        const newUserRefreshToken = await User.findByIdAndUpdate(user._id, { refreshToken: GenerateRefreshToken(user) });
+        const newRefreshToken = GenerateRefreshToken(user);
+        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken }).then(() => console.log("New Refresh Token Generated"));
 
         res.status(200).cookie('access_token', access_token, {
             httpOnly: true,
