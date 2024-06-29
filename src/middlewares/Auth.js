@@ -12,12 +12,17 @@ const validateRefreshToken = async (access_token) => {
         return null;
     }
 
-    const user = jwt.verify(tokenFromDb.refreshToken, process.env.JWT_SECRET);
-    if (!user) {
-        return null;
+    try {
+        const user = jwt.verify(tokenFromDb.refreshToken, process.env.JWT_SECRET);
+        if (!user) {
+            return null;
+        }
+
+        return user;
+    } catch (error) {
+        return false;
     }
 
-    return user;
 };
 
 const auth = async (req, res, next) => {
@@ -34,9 +39,13 @@ const auth = async (req, res, next) => {
         }
 
         const user = await validateRefreshToken(access_token);
+        if (!user) {
+            req.session.user = null;
+            return next();
+        }
         if (user) {
             console.log(`Generating new acces_token for ${user.id}`);
-            const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
             res.cookie('access_token', newAccessToken, {
                 httpOnly: true,
                 maxAge: 3600000
