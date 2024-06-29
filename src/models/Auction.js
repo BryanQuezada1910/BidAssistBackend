@@ -40,14 +40,13 @@ const AuctionSchema = new mongoose.Schema({
     },
     images: [{
       type: String,
-      required: true,
     }],
   },
   initialPrice: {
     type: Number,
     required: true,
   },
-  minimunBid: {
+  minimumBid: {
     type: Number,
     required: true,
   },

@@ -35,32 +35,47 @@ export const getAuctionById = async (req, res) => {
 // Create a new auction
 export const createAuction = async (req, res) => {
   // Check if required fields are missing  
+  const { 
+    title, 
+    description, 
+    product, 
+    initialPrice, 
+    minimumBid, 
+    category, 
+    startDate, 
+    endDate, 
+    ownerUser 
+  } = req.body;
+
   if (
-    req.body.title == null ||
-    req.body.description == null ||
-    req.body.product == null ||
-    req.body.initialPrice == null ||
-    req.body.minimunBid == null ||
-    req.body.category == null ||
-    req.body.startDate == null ||
-    req.body.endDate == null ||
-    req.body.ownerUser == null
+    !title ||
+    !description ||
+    !product ||
+    !product.name || // Verificar que product.name también esté presente
+    !initialPrice ||
+    !minimumBid ||
+    !category ||
+    !startDate ||
+    !endDate ||
+    !ownerUser
   ) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   // Create a new auction
   const auction = new Auction({
-    title: req.body.title,
-    description: req.body.description,
-    product: req.body.product,
-    initialPrice: req.body.initialPrice,
-    minimunBid: req.body.minimunBid,
-    currentBid: req.body.initialPrice,
-    category: req.body.category,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    ownerUser: req.body.ownerUser,
+    title,
+    description,
+    product: {
+      name: product.name,
+    },
+    initialPrice,
+    minimumBid,
+    currentBid: initialPrice,
+    category,
+    startDate,
+    endDate,
+    ownerUser,
   });
 
   try {
