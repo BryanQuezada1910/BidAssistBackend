@@ -86,6 +86,10 @@ export const createAuction = async (req, res) => {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
+  if (new Date() > startDate || new Date() > endDate || startDate > endDate || startDate === endDate) {
+    return res.status(400).json({ message: "Invalid dates"});
+  }
+
   // Create a new auction
   const auction = new Auction({
     title,
