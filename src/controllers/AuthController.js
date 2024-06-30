@@ -1,33 +1,40 @@
 import bcrypt from 'bcrypt';
-import User from '../models/User.js';
 import dotenv from 'dotenv';
+import User from '../models/User.js';
+
 import { addUser } from '../services/userService.js';
-import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 import { MailWrapper } from '../services/emailService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 
 dotenv.config({ path: '../../.env' });
 
+// POST: http://localhost:5000/api/auth/register
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const register = async (req, res) => {
 
-    if (!req.body) {
-        return res.status(400).json({ message: 'The body of the request is empty' });
+    const requiredFields = ['name', 'lastname', 'username', 'email', 'password'];
+
+    if (!req.body || !requiredFields.every(field => req.body[field])) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
     const { name, lastname, username, email, password } = req.body;
 
-    if (!name || !lastname || !username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-
     try {
-        let user = await User.findOne({ username });
-        if (user) {
-            return res.status(400).json({ message: "The user already exists" });
-        }
+        let userExist = await User.findOne({
+            $or: [{ username }, { email }]
+        });
 
-        user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: "The email has already been taken" });
+        if (userExist) {
+            const message = userExist.username === username ?
+                "The user already exists" :
+                "The email has already been taken";
+            return res.status(400).json({ message: message });
         }
 
         const userInfo = {
@@ -54,6 +61,13 @@ const register = async (req, res) => {
 
 };
 
+// POST: http://localhost:5000/api/auth/login 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const login = async (req, res) => {
 
     const user = req.session.user;
