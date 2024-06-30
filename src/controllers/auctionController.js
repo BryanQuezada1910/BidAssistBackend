@@ -26,7 +26,6 @@ export const getAuctionsByStatusAndCategory = async (req, res) => {
     }
 
     const auctions = await Auction.find(query);
-    console.log(auctions);
     // If no auctions are found, return a 404 error
     if (auctions.length === 0) {
       return res.status(404).json({ message: "Auctions not found" });
