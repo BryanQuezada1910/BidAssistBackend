@@ -78,15 +78,11 @@ const login = async (req, res) => {
         });
     }
 
-    if (!req.body) {
-        return res.status(400).json({ message: 'The body of the request is empty' });
+    if (!req.body || !['username', 'password'].every(field => req.body[field])) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
     const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
 
     try {
         const user = await User.findOne({ username });
@@ -109,13 +105,20 @@ const login = async (req, res) => {
         }).json({ username: user.username, email: user.email });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
+// POST: http://localhost:5000/api/auth/forgot-password
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
+
     if (!email) {
         return res.status(400).json({ message: "No email was provided" });
     }
@@ -126,18 +129,17 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: "Email is not registered" });
         }
 
-        const userEmail = user.email;
-        MailWrapper.sendResetPasswordEmail([userEmail], "test.com");
+        MailWrapper.sendResetPasswordEmail([user.email], "test.com");
 
-        res.status(200).json({ message: "Email has sent" });
+        res.status(200).json({ message: "Email has been sent" });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "An error ocurred" });
     }
 
 };
 
+// POST: http://localhost:5000/api/auth/update-password
 /**
  * 
  * @param {*} req 
@@ -179,6 +181,7 @@ const updatePassword = async (req, res) => {
 
 };
 
+// GET: http://localhost:5000/api/auth/logout
 const logout = (req, res) => {
     res.clearCookie('access_token', { httpOnly: false, domain: 'localhost', path: '/' });
     return res.status(204).end();
