@@ -44,7 +44,7 @@ const register = async (req, res) => {
         MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 3600000
         }).json({ username: newUser.username, email: newUser.email });
 
@@ -90,7 +90,7 @@ const login = async (req, res) => {
         await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken });
 
         res.status(200).cookie('access_token', access_token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 3600000
         }).json({ username: user.username, email: user.email });
 
@@ -166,7 +166,7 @@ const updatePassword = async (req, res) => {
 };
 
 const logout = (req, res) => {
-    res.clearCookie('access_token');
+    res.clearCookie('access_token', { httpOnly: false, domain: 'localhost', path: '/' });
     return res.status(204).end();
 };
 
