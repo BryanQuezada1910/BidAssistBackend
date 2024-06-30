@@ -44,7 +44,6 @@ const auth = async (req, res, next) => {
             return next();
         }
         if (user) {
-            console.log(`Generating new acces_token for ${user.id}`);
             const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
             res.cookie('access_token', newAccessToken, {
                 httpOnly: true,

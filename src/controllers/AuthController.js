@@ -87,7 +87,7 @@ const login = async (req, res) => {
 
         const access_token = GenerateAccesToken(user);
         const newRefreshToken = GenerateRefreshToken(user);
-        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken }).then(() => console.log("New Refresh Token Generated"));
+        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken });
 
         res.status(200).cookie('access_token', access_token, {
             httpOnly: true,
@@ -148,8 +148,6 @@ const updatePassword = async (req, res) => {
     try {
         const currentUserInfo = await User.findById(user.id);
 
-        console.log(currentUserInfo);
-
         const isPassValid = await bcrypt.compare(currentPassword, currentUserInfo.password);
         if (!isPassValid) {
             return res.status(401).json({ message: "Invalid credentials" });
@@ -162,7 +160,6 @@ const updatePassword = async (req, res) => {
         MailWrapper.sendPasswordResetConfirmationEmail([currentUserInfo.email], currentUserInfo.username);
         res.status(200).json({ message: "Password has been updated" });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 
