@@ -1,11 +1,13 @@
 import express from 'express';
-import { getAllAuctions, getAuctionById, createAuction, updateAuction, deleteAuction } from '../controllers/auctionController.js';
+import { getAllAuctions, getAuctionById, getAuctionsByStatusAndCategory, createAuction, updateAuction, deleteAuction } from '../controllers/auctionController.js';
 
 const router = express.Router();
 
 // Routes for auctions
 // GET /api/auctions
 router.get('/', getAllAuctions);
+// GET /api/auctions/:status/:category
+router.get('/filters/', getAuctionsByStatusAndCategory);
 // GET /api/auctions/:id
 router.get('/:id', getAuctionById);
 // POST /api/auctions

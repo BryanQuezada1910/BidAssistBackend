@@ -1,33 +1,40 @@
 import bcrypt from 'bcrypt';
-import User from '../models/User.js';
 import dotenv from 'dotenv';
+import User from '../models/User.js';
+
 import { addUser } from '../services/userService.js';
-import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 import { MailWrapper } from '../services/emailService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 
 dotenv.config({ path: '../../.env' });
 
+// POST: http://localhost:5000/api/auth/register
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const register = async (req, res) => {
 
-    if (!req.body) {
-        return res.status(400).json({ message: 'The body of the request is empty' });
+    const requiredFields = ['name', 'lastname', 'username', 'email', 'password'];
+
+    if (!req.body || !requiredFields.every(field => req.body[field])) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
     const { name, lastname, username, email, password } = req.body;
 
-    if (!name || !lastname || !username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-
     try {
-        let user = await User.findOne({ username });
-        if (user) {
-            return res.status(400).json({ message: "The user already exists" });
-        }
+        let userExist = await User.findOne({
+            $or: [{ username }, { email }]
+        });
 
-        user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: "The email has already been taken" });
+        if (userExist) {
+            const message = userExist.username === username ?
+                "The user already exists" :
+                "The email has already been taken";
+            return res.status(400).json({ message: message });
         }
 
         const userInfo = {
@@ -44,7 +51,7 @@ const register = async (req, res) => {
         MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 3600000
         }).json({ username: newUser.username, email: newUser.email });
 
@@ -54,6 +61,13 @@ const register = async (req, res) => {
 
 };
 
+// POST: http://localhost:5000/api/auth/login 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const login = async (req, res) => {
 
     const user = req.session.user;
@@ -64,15 +78,11 @@ const login = async (req, res) => {
         });
     }
 
-    if (!req.body) {
-        return res.status(400).json({ message: 'The body of the request is empty' });
+    if (!req.body || !['username', 'password'].every(field => req.body[field])) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
     const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
 
     try {
         const user = await User.findOne({ username });
@@ -87,21 +97,28 @@ const login = async (req, res) => {
 
         const access_token = GenerateAccesToken(user);
         const newRefreshToken = GenerateRefreshToken(user);
-        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken }).then(() => console.log("New Refresh Token Generated"));
+        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken });
 
         res.status(200).cookie('access_token', access_token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 3600000
         }).json({ username: user.username, email: user.email });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
+// POST: http://localhost:5000/api/auth/forgot-password
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
+
     if (!email) {
         return res.status(400).json({ message: "No email was provided" });
     }
@@ -112,18 +129,17 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: "Email is not registered" });
         }
 
-        const userEmail = user.email;
-        MailWrapper.sendResetPasswordEmail([userEmail], "test.com");
+        MailWrapper.sendResetPasswordEmail([user.email], "test.com");
 
-        res.status(200).json({ message: "Email has sent" });
+        res.status(200).json({ message: "Email has been sent" });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "An error ocurred" });
     }
 
 };
 
+// POST: http://localhost:5000/api/auth/update-password
 /**
  * 
  * @param {*} req 
@@ -148,8 +164,6 @@ const updatePassword = async (req, res) => {
     try {
         const currentUserInfo = await User.findById(user.id);
 
-        console.log(currentUserInfo);
-
         const isPassValid = await bcrypt.compare(currentPassword, currentUserInfo.password);
         if (!isPassValid) {
             return res.status(401).json({ message: "Invalid credentials" });
@@ -159,16 +173,19 @@ const updatePassword = async (req, res) => {
         const newPassword = await bcrypt.hash(password, 10);
 
         await User.findByIdAndUpdate(currentUserInfo._id, { password: newPassword, refreshToken: newRefreshToken });
+
+        MailWrapper.sendPasswordResetConfirmationEmail([currentUserInfo.email], currentUserInfo.username);
+
         res.status(200).json({ message: "Password has been updated" });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 
 };
 
+// GET: http://localhost:5000/api/auth/logout
 const logout = (req, res) => {
-    res.clearCookie('access_token');
+    res.clearCookie('access_token', { httpOnly: false, domain: 'localhost', path: '/' });
     return res.status(204).end();
 };
 

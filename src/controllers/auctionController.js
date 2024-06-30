@@ -15,6 +15,30 @@ export const getAllAuctions = async (req, res) => {
 };
 
 // Method: GET
+// Get auctions by categorie whit status active
+export const getAuctionsByStatusAndCategory = async (req, res) => {
+  const { status, category } = req.query;
+  try {
+    let query = { status: status };
+    // If category is provided, add it to the query
+    if (category) {
+      query.category = category;
+    }
+
+    const auctions = await Auction.find(query);
+    // If no auctions are found, return a 404 error
+    if (auctions.length === 0) {
+      return res.status(404).json({ message: "Auctions not found" });
+    }
+
+    res.status(200).json(auctions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+// Method: GET
 // Get a single auction by id
 export const getAuctionById = async (req, res) => {
   const { id } = req.params;
@@ -51,7 +75,7 @@ export const createAuction = async (req, res) => {
     !title ||
     !description ||
     !product ||
-    !product.name || // Verificar que product.name también esté presente
+    !product.name ||
     !initialPrice ||
     !minimumBid ||
     !category ||
@@ -60,6 +84,10 @@ export const createAuction = async (req, res) => {
     !ownerUser
   ) {
     return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if (new Date() > startDate || new Date() > endDate || startDate > endDate || startDate === endDate) {
+    return res.status(400).json({ message: "Invalid dates"});
   }
 
   // Create a new auction
@@ -188,6 +216,7 @@ export const deleteAuction = async (req, res) => {
 
 export default {
   getAllAuctions,
+  getAuctionsByStatusAndCategory,
   getAuctionById,
   createAuction,
   updateAuction,
