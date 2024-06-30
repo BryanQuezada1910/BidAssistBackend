@@ -28,8 +28,13 @@ const io = new Server(server, {
 // Connect to database
 connectDB();
 
+const corsOptions = {
+  origin: 'http://localhost:4200', // Origen de tu aplicación Angular
+  credentials: true // Permitir el uso de credenciales
+};
+
 // Enable CORS Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 // Body parser
 app.use(express.json());
 // Cookie parser

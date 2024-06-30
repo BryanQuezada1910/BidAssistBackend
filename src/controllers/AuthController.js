@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
 import { addUser } from '../services/userService.js';
-import { GenerateAccesToken } from '../services/JWTService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 import { MailWrapper } from '../services/emailService.js';
 
 dotenv.config({ path: '../../.env' });
@@ -40,6 +40,8 @@ const register = async (req, res) => {
 
         const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
+
+        MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
             httpOnly: true,
@@ -84,6 +86,8 @@ const login = async (req, res) => {
         }
 
         const access_token = GenerateAccesToken(user);
+        const newRefreshToken = GenerateRefreshToken(user);
+        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken }).then(() => console.log("New Refresh Token Generated"));
 
         res.status(200).cookie('access_token', access_token, {
             httpOnly: true,
@@ -120,9 +124,53 @@ const forgotPassword = async (req, res) => {
 
 };
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+const updatePassword = async (req, res) => {
+
+    const user = req.session.user;
+    if (!user) {
+        return res.status(401).json({
+            message: "Access Denied"
+        });
+    }
+
+    const { currentPassword, password } = req.body;
+
+    if (!currentPassword || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
+    try {
+        const currentUserInfo = await User.findById(user.id);
+
+        console.log(currentUserInfo);
+
+        const isPassValid = await bcrypt.compare(currentPassword, currentUserInfo.password);
+        if (!isPassValid) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const newRefreshToken = GenerateRefreshToken(user);
+        const newPassword = await bcrypt.hash(password, 10);
+
+        await User.findByIdAndUpdate(currentUserInfo._id, { password: newPassword, refreshToken: newRefreshToken });
+        MailWrapper.sendPasswordResetConfirmationEmail([currentUserInfo.email], currentUserInfo.username);
+        res.status(200).json({ message: "Password has been updated" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+
+};
+
 const logout = (req, res) => {
     res.clearCookie('access_token');
     return res.status(204).end();
 };
 
-export { register, login, logout, forgotPassword };
+export { register, login, logout, forgotPassword, updatePassword };
