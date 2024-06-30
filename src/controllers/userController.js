@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import User from "../models/User.js";
 
 const getAllUsers = async (req, res) => {
@@ -58,9 +59,9 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ message: 'The body of the request is empty' });
     }
 
-    const { name, lastname, username, email } = req.body;
+    const { name, lastname, username, email, password } = req.body;
 
-    if (!name || !lastname || !username || !email) {
+    if (!name || !lastname || !username || !email || !password) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -69,7 +70,8 @@ const updateUser = async (req, res) => {
             name: name,
             lastname: lastname,
             username: username,
-            email: email
+            email: email,
+            password: await bcrypt.hash(password, 10)
         }, { new: true });
 
         if (!user) {
@@ -78,6 +80,7 @@ const updateUser = async (req, res) => {
 
         res.status(200).json(user);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 

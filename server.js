@@ -7,7 +7,7 @@ import { authRouter } from './src/routes/AuthRoutes.js'; // Import auth routes
 import auctionRoutes from './src/routes/auctionRoutes.js'; // Import auction routes
 import http from 'http'; // Import http module for creating server instance
 import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHandler function
-import { usersRouter } from "./src/routes/UsersRoutes.js";
+import { usersRouter } from "./src/routes/userRoutes.js";
 import { Server } from "socket.io"; // Import Server class from socket.io
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
 import { webHookRouter } from "./src/routes/webhookRoutes.js"; // Create express appimport { ticketsRouter } from "./src/routes/ticketRoutes.js";
