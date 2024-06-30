@@ -18,17 +18,16 @@ export const getAllAuctions = async (req, res) => {
 // Get auctions by categorie whit status active
 export const getAuctionsByStatusAndCategory = async (req, res) => {
   const { status, category } = req.query;
-  console.log(status, category);
   try {
     let query = { status: status };
-    // Si category tiene algún valor, añadirlo a la consulta
+    // If category is provided, add it to the query
     if (category) {
       query.category = category;
     }
 
     const auctions = await Auction.find(query);
     console.log(auctions);
-    // Si no se encontraron subastas, retornar un mensaje de error 404
+    // If no auctions are found, return a 404 error
     if (auctions.length === 0) {
       return res.status(404).json({ message: "Auctions not found" });
     }
@@ -77,7 +76,7 @@ export const createAuction = async (req, res) => {
     !title ||
     !description ||
     !product ||
-    !product.name || // Verificar que product.name también esté presente
+    !product.name ||
     !initialPrice ||
     !minimumBid ||
     !category ||
