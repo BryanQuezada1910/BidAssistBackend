@@ -129,7 +129,7 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: "Email is not registered" });
         }
 
-        MailWrapper.sendResetPasswordEmail([user.email], `http://localhost:4200/login/user/password/update/${user._id}`);
+        MailWrapper.sendResetPasswordEmail([user.email], `http://localhost:4200/login/user/password/reset/${user._id}`);
 
         res.status(200).json({ message: "Email has been sent" });
 
