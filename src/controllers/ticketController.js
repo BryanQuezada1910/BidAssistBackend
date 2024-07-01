@@ -1,6 +1,10 @@
-import ticketModel from "../models/Ticket.js";
 import { isValidObjectId } from "mongoose";
+
+import { writeCache, requestToKey, clearCache } from "../services/redisService.js";
+import ticketModel from "../models/Ticket.js";
 import userModel from "../models/User.js";
+import { generateTicketsKey } from "../utils/keysUtils.js";
+
 
 /**
  * Controller class for managing tickets.
@@ -15,18 +19,24 @@ export class TicketController {
    */
   static async getAll(req, res) {
     try {
-      const { user: userId } = req.query;
-
+      const user = req.session;
+      console.log("\nusuar:ticket ", user)
       // Validate userId format
-      if (userId && !isValidObjectId(userId)) {
-        return res.status(400).send({ message: "Invalid user ID" });
+      if (user && !isValidObjectId(user.id)) {
+        return res.status(400).send({ message: "Invalid user" });
       }
 
       // Fetch tickets based on userId filter if provided, otherwise fetch all tickets
-      const tickets = await ticketModel.find(userId ? { createdBy: userId } : {});
+      const tickets = await ticketModel.find(user.role ? {} : { createdBy: user.id });
 
       // Handle case where no tickets are found
       if (!tickets.length) return res.status(404).send({ message: "No tickets found" });
+
+
+
+      await writeCache(generateTicketsKey(req), tickets, {
+        EX: 21600, // 6 horas
+      });
 
       // Return tickets data
       return res.status(200).json(tickets);
@@ -45,7 +55,6 @@ export class TicketController {
   static async getById(req, res) {
     try {
       const { id } = req.params;
-
       // Find ticket by ID
       const ticket = await ticketModel.findById(id);
 
@@ -67,10 +76,7 @@ export class TicketController {
    * @returns {Object} - JSON response with created ticket data or error message.
    */
   static async create(req, res) {
-    const { user: userId } = req.query;
-
-    // Validate user ID presence
-    if (!userId) return res.status(400).send({ message: "User ID not provided" });
+    const userId = req.session.id;
 
     try {
       // Validate user ID format
@@ -92,6 +98,9 @@ export class TicketController {
       // Save new ticket to database
       await newTicket.save();
 
+
+      await clearCache("Admin:tickets");
+      await clearCache(`${user.id}:tickets`);
       // Return created ticket data
       return res.status(201).json(newTicket);
     } catch (error) {
@@ -127,7 +136,11 @@ export class TicketController {
       // Handle case where ticket is not found
       if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
+      await clearCache("Admin:tickets");
+      await clearCache(`${ticket.createdBy}:tickets`);
+
       // Return success message
+
       return res.status(200).json({ message: "Deleted Ticket" });
     } catch (error) {
       // Handle server errors
@@ -153,6 +166,13 @@ export class TicketController {
 
       // Handle case where ticket is not found
       if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+
+      // await clearCache(ticketsKeysConstants.all);
+      await clearCache(ticketsKeys.generate(ticket.createdBy));
+
+      await clearCache("Admin:tickets");
+      await clearCache(`${ticket.createdBy}:tickets`);
 
       // Return updated ticket data
       return res.status(200).json(ticket);
