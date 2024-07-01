@@ -29,13 +29,11 @@ const validateRefreshToken = async (access_token) => {
 
 const auth = async (req, res, next) => {
 
-    console.log("\nuser:auth = ", req.body);
     const access_token = req.cookies.access_token;
 
     try {
         const user = jwt.verify(access_token, process.env.JWT_SECRET);
         req.session = user;
-        console.log("\nacces token valido")
 
     } catch (error) {
         if (error.name !== 'TokenExpiredError') {
@@ -48,8 +46,6 @@ const auth = async (req, res, next) => {
         }
         if (user) {
             const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            console.log("\nCreando nuevo access token")
-            console.log(newAccessToken)
             res.cookie('access_token', newAccessToken, {
                 httpOnly: true,
                 maxAge: 3600000
@@ -66,15 +62,12 @@ const auth = async (req, res, next) => {
     next();
 };
 
-
 const validateUser = async (req, res, next) => {
 
     const access_token = req.cookies.access_token;
-
     try {
         const user = jwt.verify(access_token, process.env.JWT_SECRET);
         req.session = user;
-        console.log("\nseteando sesión: ", req.session)
         return next()
     } catch (error) {
         if (error.name !== 'TokenExpiredError') {
@@ -88,8 +81,6 @@ const validateUser = async (req, res, next) => {
         if (user) {
             const newAccessToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-            console.log("\nCreando nuevo access token")
-            console.log(newAccessToken)
             res.cookie('access_token', newAccessToken, {
                 httpOnly: true,
                 maxAge: 3600000
