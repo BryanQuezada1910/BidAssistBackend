@@ -48,7 +48,6 @@ const register = async (req, res) => {
 
         const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
-
         MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
