@@ -57,7 +57,7 @@ export class ReportWrapper {
           startDate: formatDate(auction.startDate),
           productName: auction.product.name,
           initialPrice: auction.initialPrice,
-          minimunBid: auction.minimunBid,
+          minimumBid: auction.minimumBid,
         })),
         closedAuctions: closedAuctions.map(auction => ({
           title: auction.title,

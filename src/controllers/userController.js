@@ -59,19 +59,16 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ message: 'The body of the request is empty' });
     }
 
-    const { name, lastname, username, email, password } = req.body;
+    const { name, lastname } = req.body;
 
-    if (!name || !lastname || !username || !email || !password) {
+    if (!name || !lastname) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
     try {
         const user = await User.findByIdAndUpdate(id, {
             name: name,
-            lastname: lastname,
-            username: username,
-            email: email,
-            password: await bcrypt.hash(password, 10)
+            lastname: lastname
         }, { new: true });
 
         if (!user) {

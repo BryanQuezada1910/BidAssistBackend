@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import { addUser } from '../services/userService.js';
 import { MailWrapper } from '../services/emailService.js';
 import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
+import Admin from '../models/Admin.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -70,11 +71,10 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
 
-    const user = req.session.user;
-    if (user) {
+    if (req.session) {
+        console.log("ya hay sesion")
         return res.status(200).json({
-            username: user.username,
-            email: user.email
+            username: req.session.username
         });
     }
 
@@ -85,7 +85,8 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }) || await Admin.findOne({ username });
+        console.log("user:login = ", user)
         if (!user) {
             return res.status(404).json({ message: "The user does not exist" });
         }
@@ -97,14 +98,21 @@ const login = async (req, res) => {
 
         const access_token = GenerateAccesToken(user);
         const newRefreshToken = GenerateRefreshToken(user);
-        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken });
+        await User.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken }) || await Admin.findByIdAndUpdate(user._id, { refreshToken: newRefreshToken });
 
+        req.session = {
+            username: user.username,
+            id: user.id,
+            isSuscribed: user.isSuscribed,
+            role: user.role
+        }
         res.status(200).cookie('access_token', access_token, {
             httpOnly: false,
             maxAge: 3600000
         }).json({ username: user.username, email: user.email });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -129,13 +137,31 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: "Email is not registered" });
         }
 
-        MailWrapper.sendResetPasswordEmail([user.email], "test.com");
+        MailWrapper.sendResetPasswordEmail([user.email], `http://localhost:4200/login/user/password/reset/${user._id}`);
 
         res.status(200).json({ message: "Email has been sent" });
 
     } catch (error) {
         res.status(500).json({ message: "An error ocurred" });
     }
+
+};
+
+const resetPassword = async (req, res) => {
+
+    if (!req.body || !['token', 'password'].every(field => req.body[field])) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const { token, password } = req.body;
+
+    try {
+        const user = await User.findByIdAndUpdate(token, { password: await bcrypt.hash(password, 10) });
+        res.status(204).end();
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+
 
 };
 
@@ -189,4 +215,4 @@ const logout = (req, res) => {
     return res.status(204).end();
 };
 
-export { register, login, logout, forgotPassword, updatePassword };
+export { register, login, logout, forgotPassword, updatePassword, resetPassword };
