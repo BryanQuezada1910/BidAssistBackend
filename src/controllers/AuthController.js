@@ -72,7 +72,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
 
     if (req.session) {
-        console.log("ya hay sesion")
         return res.status(200).json({
             username: req.session.username
         });
@@ -86,7 +85,6 @@ const login = async (req, res) => {
 
     try {
         const user = await User.findOne({ username }) || await Admin.findOne({ username });
-        console.log("user:login = ", user)
         if (!user) {
             return res.status(404).json({ message: "The user does not exist" });
         }
