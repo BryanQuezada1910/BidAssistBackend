@@ -59,26 +59,16 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ message: 'The body of the request is empty' });
     }
 
-    const { name, lastname, username, email } = req.body;
+    const { name, lastname } = req.body;
 
-    if (!name || !lastname || !username || !email) {
+    if (!name || !lastname) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
     try {
-        if (await User.findOne({ username })) {
-            return res.status(400).json({ message: "User Already Exist" });
-        }
-
-        if (await User.findOne({ email })) {
-            return res.status(404).json({ message: "The Email Has Already Been Taken" });
-        }
-
         const user = await User.findByIdAndUpdate(id, {
             name: name,
-            lastname: lastname,
-            username: username,
-            email: email
+            lastname: lastname
         }, { new: true });
 
         if (!user) {
