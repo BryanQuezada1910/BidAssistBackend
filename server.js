@@ -1,16 +1,21 @@
 import express from "express"; // Import express module
 import dotenv from "dotenv"; // Import dotenv module
 import cors from "cors"; // Import cors module
-import connectDB from "./src/config/database.js"; // Import connectDB function
 import cookieParser from 'cookie-parser'; // Import cookie-parser module
+import http from 'http'; // Import http module for creating server instance
+import { Server } from "socket.io"; // Import Server class from socket.io
+import compression from "compression";
+import helmet from "helmet";
+
+import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHandler function
+import connectDB from "./src/config/database.js"; // Import connectDB function
+import { createRedisClient } from "./src/config/redis.js";
+
 import { authRouter } from './src/routes/AuthRoutes.js'; // Import auth routes
 import auctionRoutes from './src/routes/auctionRoutes.js'; // Import auction routes
-import http from 'http'; // Import http module for creating server instance
-import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHandler function
 import { usersRouter } from "./src/routes/userRoutes.js";
-import { Server } from "socket.io"; // Import Server class from socket.io
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
-import { webHookRouter } from "./src/routes/webhookRoutes.js"; // Create express appimport { ticketsRouter } from "./src/routes/ticketRoutes.js";
+import { webHookRouter } from "./src/routes/webhookRoutes.js"; // 
 import { reportRouter } from "./src/routes/reportRoutes.js";
 
 // Load env vars
@@ -27,12 +32,17 @@ const io = new Server(server, {
 
 // Connect to database
 connectDB();
+await createRedisClient();
+
 
 const corsOptions = {
   origin: 'http://localhost:4200', // Origen de tu aplicación Angular
   credentials: true // Permitir el uso de credenciales
 };
 
+
+app.use(compression());
+app.use(helmet())
 // Enable CORS Middleware
 app.use(cors(corsOptions));
 // Body parser
