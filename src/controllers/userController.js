@@ -1,6 +1,12 @@
-import bcrypt from 'bcrypt';
 import User from "../models/User.js";
+import { GenerateAccesToken } from '../services/JWTService.js';
 
+// GET: http://+:5000/api/user
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({});
@@ -10,6 +16,13 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// GET: http://+:5000/api/user/:id
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const getUserById = async (req, res) => {
     const { id } = req.params;
 
@@ -29,6 +42,13 @@ const getUserById = async (req, res) => {
     }
 };
 
+// DELETE: http://+:5000/api/user/:id
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const deleteUser = async (req, res) => {
     const { id } = req.params;
 
@@ -48,6 +68,13 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// PUT: http://+:5000/api/user/:id
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const updateUser = async (req, res) => {
     const { id } = req.params;
 
@@ -83,4 +110,40 @@ const updateUser = async (req, res) => {
 
 };
 
-export { getAllUsers, getUserById, deleteUser, updateUser };
+// POST: http://+:5000/api/user/:id
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+const activeSuscription = async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: "ID is required" });
+    }
+
+    try {
+        const user = await User.findByIdAndUpdate(id, { isSuscribed: true }, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Generate a new access token on jwtservice
+        const access_token = GenerateAccesToken(user);
+
+        // Delete de User cookie to send new isSuscribed cookie
+        res.clearCookie('access_token', { httpOnly: false });
+
+        res.status(200).cookie('access_token', access_token, {
+            httpOnly: false,
+            maxAge: 3600000
+        }).json({ username: user.username, email: user.email });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export { getAllUsers, getUserById, deleteUser, updateUser, activeSuscription };
