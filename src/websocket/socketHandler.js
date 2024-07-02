@@ -44,10 +44,8 @@ export default (io) => {
           await auction.save();
 
           io.to(auctionId).emit("bidUpdate", {
-            auctionId: auction._id,
             currentBid: auction.currentBid,
-            currentBidder: {
-              id: bidder,
+            currentBider: {
               username: username,
             }
           });
