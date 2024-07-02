@@ -10,24 +10,20 @@ export default (io) => {
     socket.on("bid", async (data) => {
       try {
         const { auctionId, amount, bidder, username } = data;
-        console.log(`Auction ${auctionId} received bid of $${amount} from ${bidder}`)
 
         if (!auctionId || !amount || !bidder) {
           throw new Error("Missing bid data");
         }
 
-        const auction = await Auction.findById(auctionId);
-        // const user = await User.findById(bidder);
-        console.log(auction);
-        console.log(username);
+        const auction = await Auction.findById(auctionId).populate("currentBider");
 
         if (
-          auction
-          // auction.endDate > new Date() &&
-          // amount > auction.currentBid &&
-          // amount >= auction.minimumBid &&
-          // auction.ownerUser.toString() !== bidder &&
-          // auction.status === "active"
+          auction &&
+          auction.endDate > new Date() &&
+          amount > auction.currentBid &&
+          amount >= auction.minimumBid &&
+          auction.ownerUser.toString() !== bidder &&
+          auction.status === "in progress"
         ) {
           auction.currentBid = amount + auction.currentBid;
           auction.currentBider = bidder;
@@ -44,14 +40,8 @@ export default (io) => {
           await auction.save();
 
           io.to(auctionId).emit("bidUpdate", {
-            currentBid: auction.currentBid,
-            currentBider: {
-              username: username,
-            }
+            auction
           });
-
-          console.log(`New bid of $${amount} from ${username}`);
-
 
           io.to(auctionId).emit("chatMessage", {
             username: username,
