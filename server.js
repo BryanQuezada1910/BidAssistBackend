@@ -17,6 +17,7 @@ import { usersRouter } from "./src/routes/userRoutes.js";
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
 import { webHookRouter } from "./src/routes/webhookRoutes.js"; // 
 import { reportRouter } from "./src/routes/reportRoutes.js";
+import { validateUser } from "./src/middlewares/Auth.js";
 
 // Load env vars
 dotenv.config();
@@ -50,8 +51,11 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 
+
 // Auth routes
 app.use('/api/auth', authRouter);
+
+// app.use(validateUser());
 app.use('/api/user', usersRouter);
 // Ticket routes
 app.use("/api/ticket", ticketsRouter);

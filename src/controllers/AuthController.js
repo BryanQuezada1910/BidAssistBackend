@@ -48,7 +48,6 @@ const register = async (req, res) => {
 
         const newUser = addUser(userInfo);
         const access_token = GenerateAccesToken(newUser);
-
         MailWrapper.sendWelcomeEmail([newUser.email], newUser.username);
 
         res.status(201).cookie('access_token', access_token, {
@@ -71,9 +70,9 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
 
-    if (req.session) {
+    if (req.session.user) {
         return res.status(200).json({
-            username: req.session.username
+            username: req.session.user.username
         });
     }
 
@@ -173,6 +172,7 @@ const resetPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
 
     const user = req.session.user;
+    console.log(user);
     if (!user) {
         return res.status(401).json({
             message: "Access Denied"

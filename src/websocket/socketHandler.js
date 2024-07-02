@@ -1,4 +1,5 @@
 import Auction from "../models/Auction.js";
+import User from "../models/User.js";
 
 export default (io) => {
   const activeAuctions = new Map();
@@ -8,37 +9,58 @@ export default (io) => {
 
     socket.on("bid", async (data) => {
       try {
-        const auction = await Auction.findById(data.auctionId).populate("currentBider");
+        const { auctionId, amount, bidder, username } = data;
+        console.log(`Auction ${auctionId} received bid of $${amount} from ${bidder}`)
+
+        if (!auctionId || !amount || !bidder) {
+          throw new Error("Missing bid data");
+        }
+
+        const auction = await Auction.findById(auctionId);
+        // const user = await User.findById(bidder);
+        console.log(auction);
+        console.log(username);
 
         if (
-           auction &&
-           auction.endDate > new Date() &&
-           data.amount > auction.currentBid &&
-           data.amount >= auction.minimumBid &&
-           auction.ownerUser !== data.bidder &&
-           auction.status === "active"
+          auction
+          // auction.endDate > new Date() &&
+          // amount > auction.currentBid &&
+          // amount >= auction.minimumBid &&
+          // auction.ownerUser.toString() !== bidder &&
+          // auction.status === "active"
         ) {
-          auction.currentBid = data.amount + auction.currentBid;
-          auction.currentBider = data.bidder;
+          auction.currentBid = amount + auction.currentBid;
+          auction.currentBider = bidder;
 
           const newMessage = {
-            amount: data.amount,
-            username: data.bidder,
+            amount,
+            username: username,
           };
+
+          auction.bidders.push(bidder);
 
           auction.chat.messages.push(newMessage);
 
           await auction.save();
 
-          io.to(data.auctionId).emit("bidUpdate", {
-            auctionId: auction._id,
+          io.to(auctionId).emit("bidUpdate", {
             currentBid: auction.currentBid,
-            currentBider: auction.currentBider.username,
+            currentBider: {
+              username: username,
+            }
           });
 
-          io.to(data.auctionId).emit("chatMessage", {
-            message: `Nueva oferta de ${data.bidder}: $${data.amount}`
+          console.log(`New bid of $${amount} from ${username}`);
+
+
+          io.to(auctionId).emit("chatMessage", {
+            username: username,
+            amount: amount,
+            text: `Nueva oferta de ${username} por $${amount}`
           });
+
+        } else {
+          throw new Error("Invalid bid");
         }
       } catch (error) {
         console.error("Error handling bid:", error);
@@ -47,7 +69,7 @@ export default (io) => {
 
     socket.on("joinAuction", async (auctionId) => {
       try {
-        const auction = await Auction.findById(auctionId);
+        const auction = await Auction.findById(auctionId).populate("currentBider");
         if (auction) {
           socket.join(auctionId);
           if (!activeAuctions.has(auctionId)) {
@@ -56,6 +78,8 @@ export default (io) => {
           activeAuctions.get(auctionId).add(socket.id);
 
           socket.emit("auctionData", auction);
+        } else {
+          throw new Error("Auction not found");
         }
       } catch (error) {
         console.error("Error joining auction:", error);

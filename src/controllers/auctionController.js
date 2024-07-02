@@ -121,6 +121,7 @@ export const createAuction = async (req, res) => {
     !description ||
     !product ||
     !product.name ||
+    !product.images ||
     !initialPrice ||
     !minimumBid ||
     !category ||
@@ -141,6 +142,7 @@ export const createAuction = async (req, res) => {
     description,
     product: {
       name: product.name,
+      images: product.images,
     },
     initialPrice,
     minimumBid,

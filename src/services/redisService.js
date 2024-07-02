@@ -84,7 +84,7 @@ const getkeys = () => {
 const isRedisWorking = () => {
   // verify wheter there is an active connection
   // to a Redis server or not
-  return !!redisClient?.isOpen;
+  return redisClient.isReady;
 }
 
 export const writeCache = async (key, data, options) => {
@@ -100,11 +100,14 @@ export const writeCache = async (key, data, options) => {
 
 export const readCache = async (key) => {
   let cachedValue = undefined;
-
+  console.log("está redis? : ", isRedisWorking())
   if (isRedisWorking()) {
     // try to get the cached response from redis
+    console.log("buscando data para la llave: ", key)
     cachedValue = await redisClient.get(key);
     if (cachedValue) {
+
+      console.log("data encontrad")
       // console.log(JSON.parse(zlib.inflateRawSync(Buffer.from(cachedValue, "base64"))))
       return JSON.parse(zlib.inflateRawSync(Buffer.from(cachedValue, "base64")));
     }
