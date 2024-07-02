@@ -1,11 +1,11 @@
 import express from 'express';
-import { deleteUser, getAllUsers, getUserById, updateUser } from '../controllers/userController.js';
+import { activeSuscription, deleteUser, getAllUsers, getUserById, updateUser } from '../controllers/userController.js';
+import { validateUser, auth } from '../middlewares/authMiddleware.js';
 
-const usersRouter = express.Router();
+export const usersRouter = express.Router();
 
-usersRouter.get("", getAllUsers);
-usersRouter.get("/:id", getUserById);
-usersRouter.delete("/:id", deleteUser);
-usersRouter.put("/:id", updateUser);
-
-export { usersRouter };
+usersRouter.get("", validateUser(['Admin']), getAllUsers);
+usersRouter.get("/:id", validateUser(['Admin']), getUserById);
+usersRouter.delete("/:id", validateUser(['Admin']), deleteUser);
+usersRouter.put("/:id", validateUser(['Admin', true, false]), updateUser);
+usersRouter.post("/activate/:id", auth, activeSuscription)

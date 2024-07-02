@@ -1,5 +1,5 @@
 import User from "../models/User.js"
-import { GenerateRefreshToken } from "./JWTService.js";
+import { GenerateRefreshToken } from "./jwtService.js";
 
 function addUser(user) {
     const newUser = new User({ name: user.name, lastname: user.lastname, username: user.username, email: user.email, password: user.password, isSuscribed: false });

@@ -29,16 +29,16 @@ export class ReportWrapper {
     }
   }
 
-  static async getAuctionsByStatus(status) {
-    return await Auction.find({ status }).lean();
+  static async getAuctionsByStatus(status, userId) {
+    return await Auction.find({ status, ownerUser: userId }).lean();
   }
 
-  static async generateAuctionsReport() {
+  static async generateAuctionsReport(userId) {
     try {
       // Obtener subastas por estado
-      const scheduledAuctions = await this.getAuctionsByStatus('active');
-      const activeAuctions = await this.getAuctionsByStatus('in progress');
-      const closedAuctions = await this.getAuctionsByStatus('finished');
+      const scheduledAuctions = await this.getAuctionsByStatus('active', userId);
+      const activeAuctions = await this.getAuctionsByStatus('in progress', userId);
+      const closedAuctions = await this.getAuctionsByStatus('finished', userId);
 
       const data = {
         activeAuctions: activeAuctions.map(auction => ({
@@ -82,9 +82,9 @@ export class ReportWrapper {
     }
   }
 
-  static async generateFinancialReport() {
+  static async generateFinancialReport(userId) {
     try {
-      const closedAuctions = await this.getAuctionsByStatus('finished');
+      const closedAuctions = await this.getAuctionsByStatus('finished', userId);
 
       const data = {
         closedAuctions: closedAuctions.map(auction => ({

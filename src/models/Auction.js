@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import { clearCache } from "../services/redisService.js";
 const enumCategory = [
   "Electronicos",
   "Fashion",
@@ -94,5 +94,6 @@ const AuctionSchema = new mongoose.Schema({
     messages: [messageSchema],
   },
 });
+
 
 export default mongoose.model("Auction", AuctionSchema);
