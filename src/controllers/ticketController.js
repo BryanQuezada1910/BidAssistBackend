@@ -1,6 +1,6 @@
 import { isValidObjectId } from "mongoose";
 
-import { writeCache, requestToKey, clearCache } from "../services/redisService.js";
+import { writeCache, clearCache } from "../services/redisService.js";
 import ticketModel from "../models/Ticket.js";
 import userModel from "../models/User.js";
 import { generateTicketsKey } from "../utils/keysUtils.js";
@@ -20,14 +20,14 @@ export class TicketController {
   static async getAll(req, res) {
     try {
       const user = req.session;
-      console.log("\nusuar:ticket ", user)
+
       // Validate userId format
       if (user && !isValidObjectId(user.id)) {
         return res.status(400).send({ message: "Invalid user" });
       }
 
       // Fetch tickets based on userId filter if provided, otherwise fetch all tickets
-      const tickets = await ticketModel.find(user.role ? {} : { createdBy: user.id });
+      const tickets = await ticketModel.find(user.role === "Admin" ? {} : { createdBy: user.id }).lean();
 
       // Handle case where no tickets are found
       if (!tickets.length) return res.status(404).send({ message: "No tickets found" });
@@ -42,7 +42,8 @@ export class TicketController {
       return res.status(200).json(tickets);
     } catch (error) {
       // Handle server errors
-      res.status(500).send({ error: "Internal Server Error" });
+      res.status(500).send({ message: "Internal Server Error" });
+      console.error(error);
     }
   }
 
@@ -56,16 +57,17 @@ export class TicketController {
     try {
       const { id } = req.params;
       // Find ticket by ID
-      const ticket = await ticketModel.findById(id);
+      const ticket = await ticketModel.findById(id).lean();
 
       // Handle case where ticket is not found
-      if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+      if (!ticket) return res.status(404).json({ message: "Ticket not found" });
 
       // Return ticket data
       return res.status(200).json(ticket);
     } catch (error) {
       // Handle server errors
-      return res.status(500).send({ error: "Internal Server Error" });
+      return res.status(500).send({ message: "Internal Server Error" });
+      console.error(error);
     }
   }
 
@@ -76,6 +78,7 @@ export class TicketController {
    * @returns {Object} - JSON response with created ticket data or error message.
    */
   static async create(req, res) {
+
     const userId = req.session.id;
 
     try {
@@ -83,8 +86,7 @@ export class TicketController {
       if (!isValidObjectId(userId)) return res.status(400).send({ message: "Invalid user ID" });
 
       // Find user by ID
-      const user = await userModel.findById(userId);
-
+      const user = await userModel.findById(userId).lean();
       // Handle case where user is not found
       if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -100,7 +102,7 @@ export class TicketController {
 
 
       await clearCache("Admin:tickets");
-      await clearCache(`${user.id}:tickets`);
+      await clearCache(generateTicketsKey(req));
       // Return created ticket data
       return res.status(201).json(newTicket);
     } catch (error) {
@@ -113,6 +115,7 @@ export class TicketController {
       }
 
       // Handle server errors
+      console.error(error);
       return res.status(500).send({ message: "Internal Server Error" });
     }
   }
@@ -137,13 +140,14 @@ export class TicketController {
       if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
       await clearCache("Admin:tickets");
-      await clearCache(`${ticket.createdBy}:tickets`);
+      await clearCache(generateTicketsKey(req));
 
       // Return success message
 
       return res.status(200).json({ message: "Deleted Ticket" });
     } catch (error) {
       // Handle server errors
+      console.error(error);
       return res.status(500).send({ message: "Internal Server Error" });
     }
   }
@@ -162,22 +166,20 @@ export class TicketController {
 
     try {
       // Update ticket by ID with new data
-      const ticket = await ticketModel.findByIdAndUpdate(id, req.body);
+      const ticket = await ticketModel.findByIdAndUpdate(id, req.body).lean();
 
       // Handle case where ticket is not found
       if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
 
-      // await clearCache(ticketsKeysConstants.all);
-      await clearCache(ticketsKeys.generate(ticket.createdBy));
-
+      await clearCache(generateTicketsKey(req));
       await clearCache("Admin:tickets");
-      await clearCache(`${ticket.createdBy}:tickets`);
 
       // Return updated ticket data
       return res.status(200).json(ticket);
     } catch (error) {
       // Handle server errors
+      console.error(error)
       return res.status(500).send({ message: "Internal Server Error" });
     }
   }

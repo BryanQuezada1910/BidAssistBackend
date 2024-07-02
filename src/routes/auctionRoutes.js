@@ -1,24 +1,20 @@
 import express from 'express';
 
-import { getAllAuctions, getAuctionById, getAuctionsByStatusAndCategory, createAuction, updateAuction, deleteAuction } from '../controllers/auctionController.js';
+import { getAllAuctions, getAuctionById, createAuction, updateAuction, deleteAuction } from '../controllers/auctionController.js';
 import { cache } from "../middlewares/cacheMiddleware.js";
-import { validateUser } from "../middlewares/Auth.js";
+import { validateUser } from "../middlewares/authMiddleware.js";
 import { generateAuctionsKey } from '../utils/keysUtils.js';
 
-const router = express.Router();
+export const auctionRouter = express.Router();
 
 // Routes for auctions
 // GET /api/auctions
-router.get('/', validateUser, cache(generateAuctionsKey), getAllAuctions);
-// GET /api/auctions/:status/:category
-router.get('/filters/', validateUser, getAuctionsByStatusAndCategory);
+auctionRouter.get('/', validateUser(['Admin', true, false]), cache(generateAuctionsKey), getAllAuctions);
 // GET /api/auctions/:id
-router.get('/:id', validateUser, getAuctionById);
+auctionRouter.get('/:id', validateUser(['Admin', true, false]), getAuctionById);
 // POST /api/auctions
-router.post('/', validateUser, createAuction);
+auctionRouter.post('/', validateUser([true]), createAuction);
 // PUT /api/auctions/:id
-router.put('/:id', validateUser, updateAuction);
+auctionRouter.put('/:id', validateUser(['Admin', true]), updateAuction);
 // DELETE /api/auctions/:id
-router.delete('/:id', validateUser, deleteAuction);
-
-export default router;
+auctionRouter.delete('/:id', validateUser(['Admin', true]), deleteAuction);
