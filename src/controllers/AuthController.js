@@ -172,6 +172,7 @@ const resetPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
 
     const user = req.session.user;
+    console.log(user);
     if (!user) {
         return res.status(401).json({
             message: "Access Denied"

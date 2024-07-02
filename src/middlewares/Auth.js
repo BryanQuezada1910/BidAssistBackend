@@ -33,13 +33,12 @@ const validateRefreshToken = async (access_token) => {
 };
 
 const auth = async (req, res, next) => {
-
     const access_token = req.cookies.access_token;
+    req.session = { user: null }
 
     try {
         const user = jwt.verify(access_token, process.env.JWT_SECRET);
-        req.session = user;
-
+        req.session.user = user;
     } catch (error) {
         if (error.name !== 'TokenExpiredError') {
             return next();
@@ -62,7 +61,6 @@ const auth = async (req, res, next) => {
             await writeCache(user.id, user, {
                 EX: 3600, // 1 horas
             })
-
 
         }
     };
