@@ -11,7 +11,7 @@ function addUser(user) {
                 { _id: savedUser._id },
                 { refreshToken: refresh_token },
                 { new: true }
-            ).then(() => console.log(`Add Refresh Token for ${savedUser._id}`));
+            );
         });
 
     return newUser;
