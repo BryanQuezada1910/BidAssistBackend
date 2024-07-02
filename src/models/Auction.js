@@ -1,4 +1,28 @@
 import mongoose from "mongoose";
+import { clearCache } from "../services/redisService.js";
+const enumCategory = [
+  "Electronicos",
+  "Fashion",
+  "Hogar",
+  "Juguetes",
+  "Inmuebles",
+  "Others",
+];
+
+const messageSchema = new mongoose.Schema({
+  amount: {
+    type: Number,
+    required: true,
+  },
+  username: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 const AuctionSchema = new mongoose.Schema({
   title: {
@@ -7,21 +31,32 @@ const AuctionSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: true,
   },
   product: {
-    type: ProductSchema,
-    required: true,
+    name: {
+      type: String,
+      required: true,
+    },
+    images: [{
+      type: String,
+    }],
   },
   initialPrice: {
     type: Number,
     required: true,
   },
-  minimunBid: {
+  minimumBid: {
     type: Number,
     required: true,
   },
-  finalPrice: {
+  currentBider: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  currentBid: {
     type: Number,
+    required: true,
   },
   createdAt: {
     type: Date,
@@ -29,7 +64,8 @@ const AuctionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: enumCategory
+    enum: enumCategory,
+    required: true,
   },
   startDate: {
     type: Date,
@@ -39,33 +75,25 @@ const AuctionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  organization: {
+  ownerUser: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Organization",
+    ref: "User",
     required: true,
   },
-  users: [{
+  bidders: [
+    {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    }],
+    },
+  ],
   status: {
     type: String,
-    default: "active",
+    default: "active", // active, in progress, finished
+  },
+  chat: {
+    messages: [messageSchema],
   },
 });
+
 
 export default mongoose.model("Auction", AuctionSchema);
-
-const enumCategory = [
-  "Electronicos", "Fashion", "Hogar", "Juguetes", "Inmuebles", "Others"
-];
-
-const ProductSchema = new mongoose.Schema({
-  product: {
-    type: String,
-    required: true,
-  },
-  images: {
-    type: [String],
-  },
-});

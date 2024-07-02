@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
+import Auction from "./Auction.js";
+import Ticket from "./Ticket.js";
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -31,9 +33,8 @@ const UserSchema = new mongoose.Schema({
   refreshToken: {
     type: String,
   },
-  role: {
-    type: String,
-    default: "user",
+  isSuscribed: {
+    type: Boolean
   },
 });
 
@@ -41,6 +42,16 @@ UserSchema.pre("save", async function (next) {
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
   next();
+});
+
+UserSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    await Auction.deleteMany({ ownerUser: this.getQuery()._id });
+    await Ticket.deleteMany({ createdBy: this.getQuery()._id });
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default mongoose.model("User", UserSchema);
