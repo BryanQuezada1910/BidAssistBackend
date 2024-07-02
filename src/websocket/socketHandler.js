@@ -16,7 +16,7 @@ export default (io) => {
           throw new Error("Missing bid data");
         }
 
-        const auction = await Auction.findById(auctionId);
+        const auction = await Auction.findById(auctionId).populate("currentBider");
         // const user = await User.findById(bidder);
         console.log(auction);
         console.log(username);
@@ -44,10 +44,7 @@ export default (io) => {
           await auction.save();
 
           io.to(auctionId).emit("bidUpdate", {
-            currentBid: auction.currentBid,
-            currentBider: {
-              username: username,
-            }
+            auction
           });
 
           console.log(`New bid of $${amount} from ${username}`);
