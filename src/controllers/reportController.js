@@ -1,5 +1,5 @@
 import { ReportWrapper } from "../services/reportService.js";
-
+import { isValidObjectId } from "mongoose";
 
 /**
  * Controller class for managing reports.
@@ -13,21 +13,31 @@ export class ReportController {
    * @returns {Object} - JSON response with report data or error message.
    */
   static async getReport(req, res) {
-    try {
-      const { type } = req.query;
 
-      // Validate 'type' parameter
-      if (!type || (type !== "financial" && type !== "auctions")) {
-        return res.status(400).send({ message: "Invalid or missing 'type' parameter" });
-      }
+    const user = req.session;
+
+    // Validate userId format
+    if (user && !isValidObjectId(user.id)) {
+      return res.status(400).send({ message: "Invalid user" });
+    }
+
+    const { type } = req.query;
+
+    // Validate 'type' parameter
+    if (!type || (type !== "financial" && type !== "auctions")) {
+      return res.status(400).send({ message: "Invalid or missing 'type' parameter" });
+    }
+
+    try {
+
 
       let PDF = {};
 
       // Generate report based on 'type'
       if (type === "financial") {
-        PDF = await ReportWrapper.generateFinancialReport();
+        PDF = await ReportWrapper.generateFinancialReport(user.id);
       } else if (type === "auctions") {
-        PDF = await ReportWrapper.generateAuctionsReport();
+        PDF = await ReportWrapper.generateAuctionsReport(user.id);
       }
 
       // Ensure a valid PDF object was generated

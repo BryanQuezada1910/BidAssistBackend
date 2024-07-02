@@ -4,7 +4,7 @@ import User from '../models/User.js';
 
 import { addUser } from '../services/userService.js';
 import { MailWrapper } from '../services/emailService.js';
-import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/jwtService.js';
 import Admin from '../models/Admin.js';
 
 dotenv.config({ path: '../../.env' });
@@ -57,6 +57,7 @@ const register = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
+        console.error(error);
     }
 
 };
@@ -109,8 +110,8 @@ const login = async (req, res) => {
         }).json({ username: user.username, email: user.email });
 
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: "Internal Server Error" });
+        console.error(error);
     }
 };
 
@@ -140,6 +141,7 @@ const forgotPassword = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: "An error ocurred" });
+        console.error(error);
     }
 
 };
@@ -157,6 +159,7 @@ const resetPassword = async (req, res) => {
         res.status(204).end();
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
+        console.error(error);
     }
 
 
@@ -172,7 +175,6 @@ const resetPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
 
     const user = req.session.user;
-    console.log(user);
     if (!user) {
         return res.status(401).json({
             message: "Access Denied"
@@ -203,6 +205,7 @@ const updatePassword = async (req, res) => {
         res.status(200).json({ message: "Password has been updated" });
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
+        console.error(error);
     }
 
 };

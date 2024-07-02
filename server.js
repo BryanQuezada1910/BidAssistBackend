@@ -11,13 +11,12 @@ import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHa
 import connectDB from "./src/config/database.js"; // Import connectDB function
 import { createRedisClient } from "./src/config/redis.js";
 
-import { authRouter } from './src/routes/AuthRoutes.js'; // Import auth routes
-import auctionRoutes from './src/routes/auctionRoutes.js'; // Import auction routes
+import { authRouter } from './src/routes/authRoutes.js'; // Import auth routes
+import { auctionRouter } from './src/routes/auctionRoutes.js'; // Import auction routes
 import { usersRouter } from "./src/routes/userRoutes.js";
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
 import { webHookRouter } from "./src/routes/webhookRoutes.js"; // 
 import { reportRouter } from "./src/routes/reportRoutes.js";
-import { validateUser } from "./src/middlewares/Auth.js";
 
 // Load env vars
 dotenv.config();
@@ -55,13 +54,12 @@ app.use(cookieParser());
 // Auth routes
 app.use('/api/auth', authRouter);
 
-// app.use(validateUser());
 app.use('/api/user', usersRouter);
 // Ticket routes
 app.use("/api/ticket", ticketsRouter);
-app.use("api/ticket/webhook", webHookRouter)
+app.use("api/webhook", webHookRouter)
 // Auction routes
-app.use('/api/auction', auctionRoutes);
+app.use('/api/auction', auctionRouter);
 app.use("/api/report", reportRouter);
 
 // Route get request, to test the server
