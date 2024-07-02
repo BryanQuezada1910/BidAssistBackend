@@ -4,7 +4,7 @@ import User from '../models/User.js';
 
 import { addUser } from '../services/userService.js';
 import { MailWrapper } from '../services/emailService.js';
-import { GenerateAccesToken, GenerateRefreshToken } from '../services/jwtService.js';
+import { GenerateAccesToken, GenerateRefreshToken } from '../services/JWTService.js';
 import Admin from '../models/Admin.js';
 
 dotenv.config({ path: '../../.env' });

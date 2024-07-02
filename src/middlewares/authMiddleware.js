@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import User from "../models/User.js";
 import Admin from "../models/Admin.js";
-import { GenerateAccesToken } from "../services/jwtService.js";
+import { GenerateAccesToken } from "../services/JWTService.js";
 
 dotenv.config({ path: '../../.env' });
 
