@@ -15,6 +15,6 @@ auctionRouter.get('/:id', validateUser(['Admin', true, false]), getAuctionById);
 // POST /api/auctions
 auctionRouter.post('/', validateUser([true]), createAuction);
 // PUT /api/auctions/:id
-auctionRouter.put('/:id', validateUser(['Admin', true]), updateAuction);
+auctionRouter.put('/:id', validateUser(['Admin']), updateAuction);
 // DELETE /api/auctions/:id
-auctionRouter.delete('/:id', validateUser(['Admin', true]), deleteAuction);
+auctionRouter.delete('/:id', validateUser(['Admin']), deleteAuction);
