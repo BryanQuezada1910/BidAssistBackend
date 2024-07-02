@@ -70,9 +70,9 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
 
-    if (req.session) {
+    if (req.session.user) {
         return res.status(200).json({
-            username: req.session.username
+            username: req.session.user.username
         });
     }
 
