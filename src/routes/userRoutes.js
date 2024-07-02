@@ -7,5 +7,5 @@ export const usersRouter = express.Router();
 usersRouter.get("", validateUser(['Admin']), getAllUsers);
 usersRouter.get("/:id", validateUser(['Admin']), getUserById);
 usersRouter.delete("/:id", validateUser(['Admin']), deleteUser);
-usersRouter.put("/:id", validateUser(['Admin']), updateUser);
+usersRouter.put("/:id", validateUser(['Admin', true, false]), updateUser);
 usersRouter.post("/activate/:id", auth, activeSuscription)
