@@ -11,7 +11,7 @@ import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHa
 import connectDB from "./src/config/database.js"; // Import connectDB function
 import { createRedisClient } from "./src/config/redis.js";
 
-import { authRouter } from './src/routes/authRoutes.js'; // Import auth routes
+import { authRouter } from './src/routes/AuthRoutes.js'; // Import auth routes
 import { auctionRouter } from './src/routes/auctionRoutes.js'; // Import auction routes
 import { usersRouter } from "./src/routes/userRoutes.js";
 import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket routes
