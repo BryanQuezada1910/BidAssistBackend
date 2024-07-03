@@ -140,72 +140,51 @@ export const updateAuction = async (req, res) => {
 
   const { id } = req.params;
 
+  const { title, description } = req.body;
+  if (!title || !description) {
+    return res.status(400).end();
+  }
+
   if (!isValidObjectId(id)) return res.status(400).send({ message: "Invalid Auction ID" });
 
   try {
-    const auction = await Auction.findById(id);
+
+    let query = {};
+
+    if (req.body.title) {
+      query.title = req.body.title;
+    }
+    if (req.body.description) {
+      query.description = req.body.description;
+    }
+    if (req.body.product) {
+      query.product = req.body.product;
+    }
+    if (req.body.initialPrice) {
+      query.initialPrice = req.body.initialPrice;
+    }
+    if (req.body.minimunBid) {
+      query.minimumBid = req.body.minimunBid;
+    }
+    if (req.body.currentBid) {
+      query.currentBid = req.body.currentBid;
+    }
+    if (req.body.category) {
+      query.category = req.body.category;
+    }
+    if (req.body.startDate) {
+      query.startDate = req.body.startDate;
+    }
+    if (req.body.endDate) {
+      query.endDate = req.body.endDate;
+    }
+
+    const auction = await Auction.findByIdAndUpdate(id, query, { new: true });
     // Check if auction exists
     if (!auction) return res.status(404).json({ message: "Auction not found" });
 
-    // Check if auction can be updated (20 minutes before start time)
-    const now = new Date();
-    const twentyMinutesBeforeStart = new Date(
-      auction.startDate.getTime() - 20 * 60 * 1000
-    );
-
-    if (now >= twentyMinutesBeforeStart) {
-      return res.status(400).json({
-        message:
-          "Auction cannot be updated within 20 minutes of its start time",
-      });
-    }
-
-    // Check if auction has ended
-    if (new Date() > auction.endDate) {
-      return res.status(400).json({ message: "Auction has ended" });
-    }
-
-    // Check if auction is in progress
-    if (req.body.status === "in progress") {
-      return res
-        .status(400)
-        .json({ message: "Auction cannot be updated to in progress" });
-    }
-
-    if (req.body.title != null) {
-      auction.title = req.body.title;
-    }
-    if (req.body.description != null) {
-      auction.description = req.body.description;
-    }
-    if (req.body.product != null) {
-      auction.product = req.body.product;
-    }
-    if (req.body.initialPrice != null) {
-      auction.initialPrice = req.body.initialPrice;
-    }
-    if (req.body.minimunBid != null) {
-      auction.minimumBid = req.body.minimunBid;
-    }
-    if (req.body.currentBid != null) {
-      auction.currentBid = req.body.currentBid;
-    }
-    if (req.body.category != null) {
-      auction.category = req.body.category;
-    }
-    if (req.body.startDate != null) {
-      auction.startDate = req.body.startDate;
-    }
-    if (req.body.endDate != null) {
-      auction.endDate = req.body.endDate;
-    }
-
-    const updatedAuction = await auction.save();
-
-
-
     await clearCache("Admin:auctions");
-    res.json(updatedAuction);
+    res.status(200).json(auction);
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.error(error);
