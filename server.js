@@ -28,7 +28,7 @@ const app = express();
 const server = http.createServer(app); // Create server instance
 const io = new Server(server, {
   cors: {
-    origin: "https://6684bb575c938567faa46b66--phenomenal-truffle-82e66e.netlify.app",// Allow the client to connect, must be changed in production
+    origin: "https://6684c55ee0e0d8727373722e--phenomenal-truffle-82e66e.netlify.app/",// Allow the client to connect, must be changed in production
     methods: ["GET", "POST"], // Allow GET and POST requests
   }
 }); // Create socket.io instance
@@ -38,7 +38,7 @@ connectDB();
 
 
 const corsOptions = {
-  origin: 'https://6684bb575c938567faa46b66--phenomenal-truffle-82e66e.netlify.app', // Origen de tu aplicación Angular
+  origin: 'https://6684c55ee0e0d8727373722e--phenomenal-truffle-82e66e.netlify.app/', // Origen de tu aplicación Angular
   credentials: true // Permitir el uso de credenciales
 };
 
