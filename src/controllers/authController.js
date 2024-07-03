@@ -52,7 +52,9 @@ const register = async (req, res) => {
 
         res.status(201).cookie('access_token', access_token, {
             httpOnly: false,
-            maxAge: 3600000
+            maxAge: 3600000,
+            sameSite: 'none',
+            secure: true
         }).json({ username: newUser.username, email: newUser.email });
 
     } catch (error) {
@@ -106,7 +108,9 @@ const login = async (req, res) => {
         }
         res.status(200).cookie('access_token', access_token, {
             httpOnly: false,
-            maxAge: 3600000
+            maxAge: 3600000,
+            sameSite: 'none',
+            secure: true
         }).json({ username: user.username, email: user.email });
 
     } catch (error) {

@@ -49,8 +49,10 @@ export const auth = async (req, res, next) => {
       const newAccessToken = GenerateAccesToken(user);
 
       res.cookie('access_token', newAccessToken, {
-        httpOnly: true,
-        maxAge: 3600000
+        httpOnly: false,
+        maxAge: 3600000,
+        sameSite: 'none',
+        secure: true
       });
     }
   };
@@ -77,8 +79,10 @@ export const validateUser = (validUsers) => {
       const newAccessToken = GenerateAccesToken(user);
 
       res.cookie('access_token', newAccessToken, {
-        httpOnly: true,
-        maxAge: 3600000
+        httpOnly: false,
+        maxAge: 3600000,
+        sameSite: 'none',
+        secure: true
       });
 
     }
