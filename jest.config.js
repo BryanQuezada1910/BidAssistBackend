@@ -5,6 +5,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 /** @type {import('jest').Config} */
 const config = {
   // All imported modules in your tests should be mocked automatically
@@ -70,7 +71,9 @@ const config = {
   // A set of global variables that need to be available in all test environments
   globals: {
     __MONGO_URI__: process.env.MONGO_URI,
-    __ACCESS_TOKEN__: process.env.ACCESS_TOKEN
+    __SUSCRIBED_USER_TOKEN__: process.env.SUSCRIBED_USER_TOKEN,
+    __NON_SUSCRIBED_USER_TOKEN__: process.env.NON_SUSCRIBED_USER_TOKEN,
+    __ADMIN_USER_TOKEN__: process.env.ADMIN_USER_TOKEN,
   },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
@@ -134,8 +137,8 @@ const config = {
   // setupFiles: [],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  // setupFilesAfterEnv: [],
-
+  //setupFilesAfterEnv: ['./jest.setup.after.js'],
+  // setupFiles: ['./jest.setup.js'],
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,
 
@@ -184,7 +187,7 @@ const config = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  verbose: true,
+  verbose: false,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],
