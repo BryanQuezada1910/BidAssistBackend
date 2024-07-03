@@ -21,7 +21,7 @@ import { reportRouter } from "./src/routes/reportRoutes.js";
 // Load env vars
 dotenv.config();
 
-const app = express();
+export const app = express();
 const server = http.createServer(app); // Create server instance
 const io = new Server(server, {
   cors: {
