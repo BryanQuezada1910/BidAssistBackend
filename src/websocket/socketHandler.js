@@ -18,12 +18,12 @@ export default (io) => {
         const auction = await Auction.findById(auctionId).populate("currentBider");
 
         if (
-          auction &&
-          auction.endDate > new Date() &&
-          amount > auction.currentBid &&
-          amount >= auction.minimumBid &&
-          auction.ownerUser.toString() !== bidder &&
-          auction.status === "in progress"
+          auction
+          // auction.endDate > new Date() &&
+          // amount > auction.currentBid &&
+          // amount >= auction.minimumBid &&
+          // auction.ownerUser.toString() !== bidder &&
+          // auction.status === "in progress"
         ) {
           auction.currentBid = amount + auction.currentBid;
           auction.currentBider = bidder;
