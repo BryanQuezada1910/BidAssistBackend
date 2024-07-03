@@ -1,6 +1,5 @@
 import { createClient } from "redis";
 
-
 export let redisClient = null;
 
 export const createRedisClient = async () => {
@@ -12,7 +11,6 @@ export const createRedisClient = async () => {
       socket: {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
-        key: process.env.REDIS_KEY,
         connectTimeout: 40000,
         tls: true,
         rejectUnauthorized: false,
@@ -26,7 +24,19 @@ export const createRedisClient = async () => {
         }
       }
     });
-    
+
+    redisClient.on('error', (err) => {
+      console.error('Redis client error', err);
+    });
+
+    redisClient.on('reconnecting', () => {
+      console.log('Reconnecting to Redis...');
+    });
+
+    redisClient.on('end', () => {
+      console.log('Disconnected from Redis');
+    });
+
     // connect to the Redis server
     await redisClient.connect();
     console.log(`Connected to Redis successfully!`);
@@ -34,4 +44,4 @@ export const createRedisClient = async () => {
     console.error(`Connection to Redis failed with error:`);
     console.error(e);
   }
-}
+};
