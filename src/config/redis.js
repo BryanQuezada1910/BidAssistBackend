@@ -13,7 +13,7 @@ export const createRedisClient = async () => {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
         key: process.env.REDIS_KEY,
-        connectTimeout: 15000
+        connectTimeout: 40000
       }
     });
     // connect to the Redis server
