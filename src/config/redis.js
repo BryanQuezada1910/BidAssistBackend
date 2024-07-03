@@ -14,6 +14,8 @@ export const createRedisClient = async () => {
         port: process.env.REDIS_PORT,
         key: process.env.REDIS_KEY,
         connectTimeout: 40000,
+        tls: true,
+        rejectUnauthorized: false,
         reconnectStrategy: function (retries) {
           if (retries > 40) {
             console.log("Too many attempts to reconnect. Redis connection was terminated");
