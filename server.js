@@ -1,5 +1,11 @@
-import express from "express"; // Import express module
 import dotenv from "dotenv"; // Import dotenv module
+import { createRedisClient } from "./src/config/redis.js";
+
+// Load env vars
+dotenv.config();
+await createRedisClient();
+
+import express from "express"; // Import express module
 import cors from "cors"; // Import cors module
 import cookieParser from 'cookie-parser'; // Import cookie-parser module
 import http from 'http'; // Import http module for creating server instance
@@ -9,7 +15,6 @@ import helmet from "helmet";
 
 import socketHandler from "./src/websocket/socketHandler.js"; // Import socketHandler function
 import connectDB from "./src/config/database.js"; // Import connectDB function
-import { createRedisClient } from "./src/config/redis.js";
 
 import { authRouter } from './src/routes/authRoutes.js'; // Import auth routes
 import { auctionRouter } from './src/routes/auctionRoutes.js'; // Import auction routes
@@ -18,8 +23,6 @@ import { ticketsRouter } from "./src/routes/ticketRoutes.js"; // Import ticket r
 import { webHookRouter } from "./src/routes/webHookRoutes.js"; // 
 import { reportRouter } from "./src/routes/reportRoutes.js";
 
-// Load env vars
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app); // Create server instance
@@ -32,7 +35,6 @@ const io = new Server(server, {
 
 // Connect to database
 connectDB();
-await createRedisClient();
 
 
 const corsOptions = {
