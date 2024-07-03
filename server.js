@@ -44,7 +44,7 @@ const corsOptions = {
 
 
 app.use(compression());
-app.use(helmet())
+// app.use(helmet())
 // Enable CORS Middleware
 app.use(cors(corsOptions));
 // Body parser
