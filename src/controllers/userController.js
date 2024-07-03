@@ -88,16 +88,17 @@ const updateUser = async (req, res) => {
     return res.status(400).json({ message: 'The body of the request is empty' });
   }
 
-  const { name, lastname } = req.body;
+  const { name, lastname, username } = req.body;
 
-  if (!name || !lastname) {
+  if (!name || !lastname || !username) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
   try {
     const user = await User.findByIdAndUpdate(id, {
       name: name,
-      lastname: lastname
+      lastname: lastname,
+      username: username
     }, { new: true });
 
     if (!user) {
