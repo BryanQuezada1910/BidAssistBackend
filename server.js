@@ -24,13 +24,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Configuración de Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:4200', // Cambiar al dominio real en producción
-    methods: ["GET", "POST"],
-    credentials: true // Habilita el uso de credenciales
-  }
-});
+const io = new Server(server);
 
 // Conexión a la base de datos
 connectDB();
@@ -38,11 +32,7 @@ connectDB();
 // Middleware
 app.use(compression()); // Compresión para mejorar el rendimiento
 app.use(helmet()); // Mejoras de seguridad
-app.use(cors({
-  origin: 'http://localhost:4200', // Cambiar al dominio real en producción
-  methods: ['GET', 'POST'],
-  credentials: true // Habilita el uso de credenciales (cookies, tokens, etc.)
-}));
+app.use(cors());
 app.use(express.json()); // Parseo del body de las peticiones como JSON
 app.use(cookieParser()); // Middleware para el manejo de cookies
 
