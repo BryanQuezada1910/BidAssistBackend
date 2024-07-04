@@ -32,7 +32,7 @@ connectDB();
 // Middleware
 app.use(compression()); // Compresión para mejorar el rendimiento
 app.use(helmet()); // Mejoras de seguridad
-app.use(cors());
+// app.use(cors());
 app.use(express.json()); // Parseo del body de las peticiones como JSON
 app.use(cookieParser()); // Middleware para el manejo de cookies
 
