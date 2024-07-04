@@ -29,11 +29,18 @@ const io = new Server(server);
 // Conexión a la base de datos
 connectDB();
 
+// Configuración de CORS
+const corsOptions = {
+  origin: 'https://6684c55ee0e0d8727373722e--phenomenal-truffle-82e66e.netlify.app', // Reemplaza con el origen de tu aplicación de Netlify
+  credentials: true, // Permitir el envío de credenciales
+  optionsSuccessStatus: 200 // Algunas versiones de IE necesitan este estatus
+};
+
 // Middleware
 app.use(compression()); // Compresión para mejorar el rendimiento
 // app.use(helmet()); // Mejoras de seguridad
-app.use(cors());
-app.options('*', cors());
+app.use(cors(corsOptions)); // Configuración de CORS con opciones
+app.options('*', cors(corsOptions)); // Manejo de solicitudes preflight
 app.use(express.json()); // Parseo del body de las peticiones como JSON
 app.use(cookieParser()); // Middleware para el manejo de cookies
 
